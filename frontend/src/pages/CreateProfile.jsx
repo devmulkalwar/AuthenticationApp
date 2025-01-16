@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input"; // Assuming you have an Input component
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"; // Assuming you have an Avatar component
-import { cn } from "@/lib/utils"; // Utility for className merging
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 const CreateProfile = () => {
+  // State for form fields
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [bio, setBio] = useState("");
@@ -16,20 +17,25 @@ const CreateProfile = () => {
   const [linkedin, setLinkedin] = useState("");
   const [message, setMessage] = useState("");
 
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     // Replace this with your actual logic (e.g., API call to update profile)
     setMessage("Profile updated successfully!");
   };
 
+  // Handle profile picture upload
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
+        console.log("FileReader result:", reader.result); // Debugging
         setProfilePicture(reader.result);
       };
       reader.readAsDataURL(file);
+    } else {
+      console.log("No file selected"); // Debugging
     }
   };
 
@@ -48,8 +54,11 @@ const CreateProfile = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Profile Picture */}
               <div className="flex flex-col items-center gap-4">
-                <Avatar className="w-24 h-24">
-                  <AvatarImage src={profilePicture} alt="Profile Picture" />
+                <Avatar className="w-24 h-24 border-2 border-red-500">
+                  <AvatarImage
+                    src={profilePicture || "https://via.placeholder.com/150"}
+                    alt="Profile Picture"
+                  />
                   <AvatarFallback>{name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <input
@@ -150,8 +159,11 @@ const CreateProfile = () => {
           </CardHeader>
           <CardContent className="flex flex-col items-center gap-4">
             {/* Profile Picture */}
-            <Avatar className="w-32 h-32">
-              <AvatarImage src={profilePicture} alt="Profile Picture" />
+            <Avatar className="w-32 h-32 border-2 border-red-500">
+              <AvatarImage
+                src={profilePicture || "https://via.placeholder.com/150"}
+                alt="Profile Picture"
+              />
               <AvatarFallback>{name.charAt(0)}</AvatarFallback>
             </Avatar>
 

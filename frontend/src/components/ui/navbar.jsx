@@ -7,7 +7,7 @@ import { Button } from "./button";
 const Navbar = React.forwardRef(({ className, ...props }, ref) => (
   <nav
     ref={ref}
-    className={cn("sticky top-0 border bg-card text-card-foreground shadow", className)}
+    className={cn("sticky top-0 z-50 border bg-card text-card-foreground shadow", className)}
     {...props}
   />
 ));
