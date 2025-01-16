@@ -1,12 +1,21 @@
+import React from "react";
 
-import Login from "./pages/Login";
-import Register from "./pages/Register";
+import Footer from "./components/Footer";
+import { Outlet } from "react-router-dom";
+import Header from "./components/Header";
+
 
 function App() {
   return (
-    
-      // <Login/>
-      <Register/>
+   
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <main className="flex flex-grow">
+          <Outlet />
+        </main>
+        <Footer />
+      
+      </div>
     
   );
 }
