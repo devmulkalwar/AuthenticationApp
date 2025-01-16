@@ -11,6 +11,9 @@ import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import Error from "./pages/Error";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import CreateProfile from "./pages/CreateProfile";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +50,18 @@ const router = createBrowserRouter([
         path: "reset-password/:token",
         element: <ResetPassword />,
       },
+      {
+        path:"about",
+        element:<About/>
+      },
+      {
+        path:"contact",
+        element:<Contact/>
+      },
+      {
+        path:"create-profile",
+        element:<CreateProfile/>
+      }
     ],
   },
 ]);

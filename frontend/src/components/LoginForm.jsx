@@ -51,7 +51,7 @@ export function LoginForm({ className, ...props }) {
              
             </div>
             <div className="mt-4 text-center text-sm">
-              Don't have an account?
+              Don't have an account?{" "}
               <Link to="/register" className="underline underline-offset-4">
                 Register
               </Link>
