@@ -2,7 +2,7 @@ import express from "express";
 import {
   login,
   logout,
-  signup,
+  register,
   verifyEmail,
   forgotPassword,
   resetPassword,
@@ -18,7 +18,7 @@ import { verifyToken } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 // Auth routes
-router.post("/signup", signup);
+router.post("/register", register);
 router.post("/login", login);
 router.post("/logout", logout);
 

@@ -4,7 +4,6 @@ const userSchema = new mongoose.Schema(
   {
     fullName: {
       type: String,
-      required: true,
     },
     email: {
       type: String,
@@ -43,6 +42,10 @@ const userSchema = new mongoose.Schema(
     },
     isVerified: {
       type: Boolean,
+      default: false, 
+    },
+    isProfileComplete:{
+      type:Boolean,
       default: false, 
     },
     resetPasswordToken: String, 

@@ -14,13 +14,13 @@ import dotenv from "dotenv";
 dotenv.config();
 
 // Register new user
-export const signup = async (req, res) => {
-  const { fullName, email, password, confirmPassword,  } = req.body;
+export const register = async (req, res) => {
+  const { email, password, confirmPassword  } = req.body;
 
   try {
     console.log("Request body:", req.body);
 
-    if (!email || !password || !fullName || !confirmPassword ) {
+    if (!email || !password || !confirmPassword ) {
       throw new Error("All fields are required");
     }
 
@@ -43,7 +43,6 @@ export const signup = async (req, res) => {
     const user = new User({
       email,
       password: hashedPassword,
-      fullName,
       verificationToken,
       verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000,
     });
@@ -271,8 +270,8 @@ export const changePassword = async (req, res) => {
 
 // Create profile
 export const createProfile = async (req, res) => {
-  const { userId, profilePicture, socialMedia } = req.body;
-
+  const { userId ,fullName, profilePicture, socialMedia } = req.body;
+ console.log(userId);
   try {
     // Find the user
     const user = await User.findById(userId);
@@ -281,8 +280,10 @@ export const createProfile = async (req, res) => {
     }
 
     // Update profile fields
+    user.fullName = fullName;
     user.profilePicture = profilePicture;
     user.socialMedia = socialMedia;
+    user.isProfileComplete = true;
     await user.save();
 
     res.status(200).json({ success: true, message: "Profile created successfully", user });
@@ -318,18 +319,27 @@ export const updateProfile = async (req, res) => {
 
 // Delete profile
 export const deleteProfile = async (req, res) => {
-  const { userId } = req.body;
+  const { userId, password } = req.body;
 
   try {
-    // Find and delete the user
-    const user = await User.findByIdAndDelete(userId);
+    // Find the user by ID
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
+    // Validate the password
+    const isPasswordValid = await bcryptjs.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ success: false, message: "Invalid password" });
+    }
+
+    // Delete the user
+    await User.findByIdAndDelete(userId);
+
     res.status(200).json({ success: true, message: "Profile deleted successfully" });
   } catch (error) {
-    console.log("Error in deleteProfile ", error);
+    console.log("Error in deleteProfile:", error);
     res.status(500).json({ success: false, message: "Error deleting profile" });
   }
 };
