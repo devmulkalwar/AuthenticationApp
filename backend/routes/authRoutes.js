@@ -10,9 +10,11 @@ import {
   createProfile,
   updateProfile,
   deleteProfile,
-  changePassword
+  changePassword,
+  getAllUsers,
 } from "../controllers/authController.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
+import { upload } from "../middleware/multerMiddleware.js";
 // import { upload } from "../middleware/multerMiddleware.js"; // Uncomment if using file upload
 
 const router = express.Router();
@@ -30,8 +32,9 @@ router.post("/change-password", verifyToken, changePassword);
 
 // Protected routes (require authentication)
 router.get("/check-auth", verifyToken, checkAuth);
-router.post("/create-profile", verifyToken, createProfile); // Create profile
-router.post("/edit-profile", verifyToken, updateProfile); // Edit profile
+router.post("/create-profile",upload.single("profilePicture"), verifyToken, createProfile); // Create profile
+router.post("/edit-profile", upload.single("profilePicture"), verifyToken, updateProfile); // Edit profile
 router.post("/delete-profile", verifyToken, deleteProfile); // Delete profile
 
+router.get("/get-all-users", getAllUsers); // Get all users
 export default router;

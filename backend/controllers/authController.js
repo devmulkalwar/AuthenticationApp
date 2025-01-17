@@ -268,54 +268,109 @@ export const changePassword = async (req, res) => {
   }
 };
 
-// Create profile
+//Create Profile
 export const createProfile = async (req, res) => {
-  const { userId ,fullName, profilePicture, socialMedia } = req.body;
- console.log(userId);
+  const { userId, fullName, socialMedia } = req.body;
+  const profilePicture = req.file;
+
+  let path;
+  if (profilePicture) {
+    path = profilePicture.path; // Extract file path
+  }
+
   try {
+    // Validate required fields
+    if (!userId || !fullName || !socialMedia || !profilePicture) {
+      throw new Error("All fields are required");
+    }
+
     // Find the user
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Update profile fields
+    // Upload profile picture to Cloudinary
+    let profilePictureUrl = "";
+    if (profilePicture) {
+      const cloudinaryResult = await uploadOnCloudinary(path);
+      profilePictureUrl = cloudinaryResult.url;
+    }
+
+    // Update user fields
     user.fullName = fullName;
-    user.profilePicture = profilePicture;
+    user.profilePicture = profilePictureUrl;
     user.socialMedia = socialMedia;
     user.isProfileComplete = true;
+
+    // Save updated user
     await user.save();
 
     res.status(200).json({ success: true, message: "Profile created successfully", user });
   } catch (error) {
-    console.log("Error in createProfile ", error);
-    res.status(500).json({ success: false, message: "Error creating profile" });
+    console.error("Error in createProfile:", error);
+
+    // Handle error response
+    res.status(500).json({ success: false, message: error.message || "Error creating profile" });
+  } finally {
+    // Delete local file if it exists
+    if (path && fs.existsSync(path)) {
+      fs.unlinkSync(path);
+    }
   }
 };
 
 // Update profile
 export const updateProfile = async (req, res) => {
-  const { userId, fullName, profilePicture, socialMedia } = req.body;
+  const { userId, fullName, socialMedia } = req.body;
+  const profilePictureFile = req.file; // Assuming file upload middleware like multer is used
+
+  let profilePictureUrl = null;
+  let tempFilePath = null;
 
   try {
+    // Validate user ID
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "User ID is required" });
+    }
+
     // Find the user
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Update profile fields
+    // Handle profile picture upload if a file is provided
+    if (profilePictureFile) {
+      tempFilePath = profilePictureFile.path; // Get the temporary file path
+      const cloudinaryResult = await uploadOnCloudinary(tempFilePath); // Upload file to Cloudinary
+      profilePictureUrl = cloudinaryResult.url; // Extract URL from Cloudinary response
+    }
+
+    // Update the user's fields only if new data is provided
     user.fullName = fullName || user.fullName;
-    user.profilePicture = profilePicture || user.profilePicture;
+    user.profilePicture = profilePictureUrl || user.profilePicture;
     user.socialMedia = socialMedia || user.socialMedia;
+
+    // Save the updated user document
     await user.save();
 
     res.status(200).json({ success: true, message: "Profile updated successfully", user });
   } catch (error) {
-    console.log("Error in updateProfile ", error);
-    res.status(500).json({ success: false, message: "Error updating profile" });
+    console.error("Error in updateProfile:", error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message || "Error updating profile",
+    });
+  } finally {
+    // Cleanup: Delete the temporary file if it exists
+    if (tempFilePath && fs.existsSync(tempFilePath)) {
+      fs.unlinkSync(tempFilePath);
+    }
   }
 };
+
 
 // Delete profile
 export const deleteProfile = async (req, res) => {
@@ -341,5 +396,21 @@ export const deleteProfile = async (req, res) => {
   } catch (error) {
     console.log("Error in deleteProfile:", error);
     res.status(500).json({ success: false, message: "Error deleting profile" });
+  }
+};
+
+export const getAllUsers = async (req, res) => {
+  const { userId } = req.body;
+  try {
+    // Assuming req.user contains the logged-in user's details
+    const loggedInUserId = userId;
+
+    // Exclude the logged-in user from the query result
+    const users = await User.find({ _id: { $ne: loggedInUserId } });
+
+    res.status(200).json({ success: true, users });
+  } catch (error) {
+    console.error("Error in getAllUsers:", error);
+    res.status(500).json({ success: false, message: "Error getting users" });
   }
 };
