@@ -270,7 +270,7 @@ export const changePassword = async (req, res) => {
 
 //Create Profile
 export const createProfile = async (req, res) => {
-  const { userId, fullName, socialMedia } = req.body;
+  const { userId, fullName, socialMedia , bio } = req.body;
   const profilePicture = req.file;
 
   let path;
@@ -280,7 +280,7 @@ export const createProfile = async (req, res) => {
 
   try {
     // Validate required fields
-    if (!userId || !fullName || !socialMedia || !profilePicture) {
+    if (!userId || !fullName || !socialMedia || !profilePicture || !bio) {
       throw new Error("All fields are required");
     }
 
@@ -301,6 +301,7 @@ export const createProfile = async (req, res) => {
     user.fullName = fullName;
     user.profilePicture = profilePictureUrl;
     user.socialMedia = socialMedia;
+    user.bio = bio;
     user.isProfileComplete = true;
 
     // Save updated user
@@ -400,13 +401,23 @@ export const deleteProfile = async (req, res) => {
 };
 
 export const getAllUsers = async (req, res) => {
+  const { userId } = req.query;  // Fetch userId from the query string
+  console.log(userId);
+
   try {
-     
-    const users = await User.find();
-    console.log( users);
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "User ID is required" });
+    }
+
+    const loggedInUser = userId; 
+
+    const users = await User.find({ _id: { $ne: loggedInUser } });
+    console.log(users);
+
     res.status(200).json({ success: true, users });
   } catch (error) {
     console.error("Error in getAllUsers:", error);
     res.status(500).json({ success: false, message: "Error getting users" });
   }
 };
+

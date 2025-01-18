@@ -149,7 +149,7 @@ export const ContextProvider = ({ children }) => {
       setUser(response.data.user);
       setIsAuthenticated(true);
 
-      navigate("/");
+      navigate("/create-profile");
     } catch (err) {
       const errorMessage =
         err.response?.data?.message || "Error in email verification";
@@ -250,7 +250,8 @@ export const ContextProvider = ({ children }) => {
       // Update user and authentication status based on the response
       if (response.data.user) {
         setUser(response.data.user);
-        getAllUsers(user._id);
+        console.log(response.data.user._id);
+        getAllUsers(response.data.user._id);
         setIsAuthenticated(true);
       } else {
         setUser(null);
@@ -422,32 +423,29 @@ export const ContextProvider = ({ children }) => {
     setIsLoading(true);
     setMessage(null);
     setError(null);
+  
     try {
       const response = await axios.get(
-        `${SERVER_URL}/get-all-users`,
-        {},
+        `${SERVER_URL}/get-all-users`, 
         {
-          withCredentials: true,
+          params: { userId },  // Send the userId as a query parameter
+          withCredentials: true, // This ensures the cookie is included in the request
         }
       );
-
+  
       console.log(response);
-
+  
       const users = response.data.users;
-      const loggedInUserId = "678a8b9c5742421e1df4a0ec"; // Replace with actual logged-in user's ID
-
-      // Filter out the logged-in user
-      const filteredUsers = users.filter((user) => user._id !== loggedInUserId);
-      setUsers(filteredUsers);
+      setUsers(users);
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Error in fetching users";
+      const errorMessage = err.response?.data?.message || "Error in fetching users";
       setError(errorMessage);
       console.error("Error fetching users:", err);
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   // Execute checkAuth when the component mounts
   useEffect(() => {

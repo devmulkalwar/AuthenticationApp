@@ -1,47 +1,75 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { useGlobalContext } from "@/hooks/useGlobalContext";
 
 const CreateProfile = () => {
-  // State for form fields
+  const { createProfile, user } = useGlobalContext();
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [bio, setBio] = useState("");
-  const [profilePicture, setProfilePicture] = useState("");
+  const [profilePicture, setProfilePicture] = useState(null); // Use null initially
   const [instagram, setInstagram] = useState("");
   const [twitter, setTwitter] = useState("");
   const [github, setGithub] = useState("");
   const [linkedin, setLinkedin] = useState("");
   const [message, setMessage] = useState("");
 
-  // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Replace this with your actual logic (e.g., API call to update profile)
-    setMessage("Profile updated successfully!");
+    const socialMedia = {
+      instagram: instagram,
+      twitter: twitter,
+      github: github,
+      linkedin: linkedin,
+    };
+    // Create FormData object
+    const formData = new FormData();
+    formData.append("userId", user._id);
+    formData.append("fullName", name);
+    formData.append("bio", bio);
+
+    formData.append("socialMedia[github]", github);
+    formData.append("socialMedia[instagram]", instagram);
+    formData.append("socialMedia[linkedin]", linkedin);
+    formData.append("socialMedia[twitter]", twitter);
+
+    // Append the profile picture to formData if available
+    if (profilePicture) {
+      formData.append("profilePicture", profilePicture);
+    }
+
+    try {
+      await createProfile(formData);
+      setMessage("Profile created successfully!");
+    } catch (error) {
+      setMessage("Error occurred while creating profile.");
+    }
   };
 
-  // Handle profile picture upload
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        console.log("FileReader result:", reader.result); // Debugging
-        setProfilePicture(reader.result);
+        setProfilePicture(file); // Store the file itself
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(file); // Read the file as a data URL
     } else {
-      console.log("No file selected"); // Debugging
+      console.log("No file selected");
     }
   };
 
   return (
     <div className="flex flex-grow w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="w-full max-w-2xl">
         {/* Edit Profile Section */}
         <Card className={cn("flex flex-col gap-6")}>
           <CardHeader>
@@ -54,13 +82,17 @@ const CreateProfile = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Profile Picture */}
               <div className="flex flex-col items-center gap-4">
-                <Avatar className="w-24 h-24 border-2 border-red-500">
-                  <AvatarImage
-                    src={profilePicture || "https://via.placeholder.com/150"}
+                <div className="w-24 h-24 border-2 border-red-500 rounded-full overflow-hidden">
+                  <img
+                    src={
+                      profilePicture
+                        ? URL.createObjectURL(profilePicture)
+                        : "https://via.placeholder.com/150"
+                    }
                     alt="Profile Picture"
+                    className="w-full h-full object-cover"
                   />
-                  <AvatarFallback>{name.charAt(0)}</AvatarFallback>
-                </Avatar>
+                </div>
                 <input
                   type="file"
                   accept="image/*"
@@ -82,15 +114,6 @@ const CreateProfile = () => {
                 placeholder="Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                required
-              />
-
-              {/* Email */}
-              <Input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 required
               />
 
@@ -132,7 +155,7 @@ const CreateProfile = () => {
 
               {/* Submit Button */}
               <Button type="submit" className="w-full">
-                Save Changes
+                Create Profile
               </Button>
             </form>
 
@@ -140,81 +163,14 @@ const CreateProfile = () => {
             {message && (
               <p
                 className={`mt-4 text-center ${
-                  message.includes("successfully") ? "text-green-600" : "text-red-600"
+                  message.includes("successfully")
+                    ? "text-green-600"
+                    : "text-red-600"
                 }`}
               >
                 {message}
               </p>
             )}
-          </CardContent>
-        </Card>
-
-        {/* Profile Preview Section */}
-        <Card className={cn("flex flex-col gap-6")}>
-          <CardHeader>
-            <CardTitle className="text-center">Profile Preview</CardTitle>
-            <CardDescription className="text-center">
-              This is how your profile will look to others.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center gap-4">
-            {/* Profile Picture */}
-            <Avatar className="w-32 h-32 border-2 border-red-500">
-              <AvatarImage
-                src={profilePicture || "https://via.placeholder.com/150"}
-                alt="Profile Picture"
-              />
-              <AvatarFallback>{name.charAt(0)}</AvatarFallback>
-            </Avatar>
-
-            {/* Name */}
-            <h2 className="text-2xl font-semibold">{name || "Your Name"}</h2>
-
-            {/* Email */}
-            <p className="text-sm text-gray-600">{email || "your.email@example.com"}</p>
-
-            {/* Bio */}
-            <p className="text-center text-gray-700">{bio || "A short bio about yourself."}</p>
-
-            {/* Social Media Links */}
-            <div className="flex gap-4">
-              {instagram && (
-                <a href={instagram} target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="https://img.icons8.com/fluent/48/000000/instagram-new.png"
-                    alt="Instagram"
-                    className="w-6 h-6"
-                  />
-                </a>
-              )}
-              {twitter && (
-                <a href={twitter} target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="https://img.icons8.com/fluent/48/000000/twitter.png"
-                    alt="Twitter"
-                    className="w-6 h-6"
-                  />
-                </a>
-              )}
-              {github && (
-                <a href={github} target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="https://img.icons8.com/fluent/48/000000/github.png"
-                    alt="GitHub"
-                    className="w-6 h-6"
-                  />
-                </a>
-              )}
-              {linkedin && (
-                <a href={linkedin} target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="https://img.icons8.com/fluent/48/000000/linkedin.png"
-                    alt="LinkedIn"
-                    className="w-6 h-6"
-                  />
-                </a>
-              )}
-            </div>
           </CardContent>
         </Card>
       </div>
