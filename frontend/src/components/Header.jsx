@@ -79,7 +79,6 @@ const Header = () => {
           <NavbarMenu className="order-3 hidden md:flex">
             <NavbarLinks>
               <NavbarLink to="/">Home</NavbarLink>
-              <NavbarLink to="/about">About</NavbarLink>
               <NavbarLink to="/profile">Profile</NavbarLink>
               <NavbarLink to="/contact">Contact</NavbarLink>
             </NavbarLinks>
@@ -183,9 +182,6 @@ const Header = () => {
           <div className="px-2 pt-2 pb-4 space-y-2 sm:px-3">
             <NavbarLink to="/" className="block">
               Home
-            </NavbarLink>
-            <NavbarLink to="/about" className="block">
-              About
             </NavbarLink>
             <NavbarLink to="/profile" className="block">
               Profile

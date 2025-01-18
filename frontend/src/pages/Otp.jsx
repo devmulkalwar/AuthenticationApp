@@ -8,8 +8,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { cn } from "@/lib/utils"; // Ensure you have this utility for className merging
+import { useGlobalContext } from "@/hooks/useGlobalContext";
 
 export default function Otp() {
+  const{verifyEmail} = useGlobalContext();
   const [otp, setOtp] = useState("");
   const [message, setMessage] = useState("");
   const [timer, setTimer] = useState(30); // 30-second timer
@@ -28,12 +30,11 @@ export default function Otp() {
   }, [timer]);
 
   const handleVerify = () => {
-    // Replace this with your actual verification logic
-    if (otp === "123456") {
-      setMessage("OTP verified successfully!");
-    } else {
-      setMessage("Invalid OTP. Please try again.");
-    }
+   if(otp===""){
+      setMessage("Please enter OTP");
+   }else{
+      verifyEmail(otp);
+   }
   };
 
   const handleResendOtp = () => {
