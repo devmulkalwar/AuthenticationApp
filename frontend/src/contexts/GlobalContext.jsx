@@ -182,7 +182,7 @@ export const ContextProvider = ({ children }) => {
         const message = response.data.message;
         setMessage(message);
         handleToast(message, "success");
-        navigate("/dashboard");
+        navigate("/");
       } else {
         throw new Error("Unexpected response from the server");
       }
@@ -370,14 +370,14 @@ export const ContextProvider = ({ children }) => {
   };
 
   //Change Password
-  const changePassword = async (oldPassword, newPassword) => {
+  const changePassword = async (userId, currentPassword, newPassword) => {
     setIsLoading(true);
     setError(null);
     setMessage(null);
     try {
-      const response = await axios.put(
+      const response = await axios.post(
         `${SERVER_URL}/change-password`,
-        { oldPassword, newPassword },
+        { userId, currentPassword, newPassword },
         { withCredentials: true }
       );
       console.log(response);
@@ -400,9 +400,13 @@ export const ContextProvider = ({ children }) => {
     setError(null);
     setMessage(null);
     try {
-      const response = await axios.delete(`${SERVER_URL}/delete-profile`, {
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        `${SERVER_URL}/delete-profile`,
+        { password, userId },
+        {
+          withCredentials: true,
+        }
+      );
       console.log(response);
       setMessage(response.data.message);
       handleToast(message, "success");
@@ -423,29 +427,26 @@ export const ContextProvider = ({ children }) => {
     setIsLoading(true);
     setMessage(null);
     setError(null);
-  
+
     try {
-      const response = await axios.get(
-        `${SERVER_URL}/get-all-users`, 
-        {
-          params: { userId },  // Send the userId as a query parameter
-          withCredentials: true, // This ensures the cookie is included in the request
-        }
-      );
-  
+      const response = await axios.get(`${SERVER_URL}/get-all-users`, {
+        params: { userId }, // Send the userId as a query parameter
+        withCredentials: true, // This ensures the cookie is included in the request
+      });
+
       console.log(response);
-  
+
       const users = response.data.users;
       setUsers(users);
     } catch (err) {
-      const errorMessage = err.response?.data?.message || "Error in fetching users";
+      const errorMessage =
+        err.response?.data?.message || "Error in fetching users";
       setError(errorMessage);
       console.error("Error fetching users:", err);
     } finally {
       setIsLoading(false);
     }
   };
-  
 
   // Execute checkAuth when the component mounts
   useEffect(() => {
