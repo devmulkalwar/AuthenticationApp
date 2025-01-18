@@ -1,210 +1,139 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";  // assuming you're using axios for API requests
-import { useGlobalContext } from "@/hooks/useGlobalContext";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import React, { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { FaTwitter, FaLinkedin, FaGithub, FaInstagram } from "react-icons/fa";
+import { useGlobalContext } from "@/hooks/useGlobalContext";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
-  const { user, editProfile } = useGlobalContext();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [bio, setBio] = useState("");
-  const [profilePicture, setProfilePicture] = useState("");
-  const [instagram, setInstagram] = useState("");
-  const [twitter, setTwitter] = useState("");
-  const [github, setGithub] = useState("");
-  const [linkedin, setLinkedin] = useState("");
-  const [message, setMessage] = useState("");
-
-  // Track the initial values for comparison
-  const [initialValues, setInitialValues] = useState({});
-
-  // Function to compare current state with initial values
-  const hasChanges = () => {
-    return (
-      name !== initialValues.name ||
-      email !== initialValues.email ||
-      bio !== initialValues.bio ||
-      instagram !== initialValues.instagram ||
-      twitter !== initialValues.twitter ||
-      github !== initialValues.github ||
-      linkedin !== initialValues.linkedin ||
-      profilePicture !== initialValues.profilePicture
-    );
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!hasChanges()) {
-      setMessage("No changes detected.");
-      return; // Don't submit if there are no changes
-    }
-
-    // Create FormData object
-    const formData = new FormData();
-    formData.append("userId", user._id);
-    formData.append("fullName", name);
-    formData.append("bio", bio);
-    formData.append("socialMedia[github]", github);
-    formData.append("socialMedia[instagram]", instagram);
-    formData.append("socialMedia[linkedin]", linkedin);
-    formData.append("socialMedia[twitter]", twitter);
-
-    // Append the profile picture to formData if available
-    if (profilePicture) {
-      formData.append("profilePicture", profilePicture);
-    }
-
-    try {
-      await editProfile(formData);
-      setMessage("Profile updated successfully!");
-    } catch (error) {
-      setMessage("Error occurred while updating profile.");
-    }
-  };
-
-  const handleProfilePictureChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfilePicture(reader.result);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      console.log("No file selected");
-    }
-  };
+  const { user, deleteUser, navigateToEditProfile } = useGlobalContext(); // Assuming these actions exist in your context
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     if (user) {
-      // Initialize form state and store initial values for comparison
-      setName(user.fullName);
-      setEmail(user.email);  // Make sure the email is tracked
-      setBio(user.bio);
-      setProfilePicture(user.profilePicture);
-      setInstagram(user.socialMedia.instagram);
-      setTwitter(user.socialMedia.twitter);
-      setGithub(user.socialMedia.github);
-      setLinkedin(user.socialMedia.linkedin);
-
-      // Set initial values for comparison later
-      setInitialValues({
-        name: user.fullName,
-        email: user.email,  // Ensure email is included in the initial values
-        bio: user.bio,
-        profilePicture: user.profilePicture,
-        instagram: user.socialMedia.instagram,
-        twitter: user.socialMedia.twitter,
-        github: user.socialMedia.github,
-        linkedin: user.socialMedia.linkedin
-      });
+      setCurrentUser(user);
     }
   }, [user]);
 
+  if (!currentUser) {
+    return <p className="text-center text-gray-600">No user information available.</p>;
+  }
+
+  const {
+    fullName: name,
+    email,
+    profilePicture,
+    bio,
+    socialMedia,
+    createdAt,
+  } = currentUser;
+
+  // Format the date for "Member since" display
+  const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  // Handler for the Edit button
+
+
+  // Handler for the Delete button
+  const handleDeleteProfile = async () => {
+    if (window.confirm("Are you sure you want to delete your profile?")) {
+      try {
+        await deleteUser(user._id); // Replace with your delete profile logic
+        alert("Profile deleted successfully.");
+      } catch (error) {
+        console.error("Error deleting profile:", error);
+        alert("Failed to delete profile.");
+      }
+    }
+  };
+
   return (
-    <div className="flex flex-grow w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-4xl">
-        {/* Edit Profile Section */}
-        <Card className="flex flex-col gap-6">
-          <CardHeader>
-            <CardTitle className="text-center">Edit Profile</CardTitle>
-            <CardDescription className="text-center">
-              Update your profile information and social media links.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Profile Picture */}
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-24 h-24 border-2 border-red-500 rounded-full overflow-hidden">
-                  <img
-                    src={profilePicture || "https://via.placeholder.com/150"}
-                    alt="Profile Picture"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleProfilePictureChange}
-                  className="hidden"
-                  id="profile-picture"
-                />
-                <label
-                  htmlFor="profile-picture"
-                  className="text-sm text-blue-600 cursor-pointer hover:underline"
-                >
-                  Upload Profile Picture
-                </label>
-              </div>
-
-              {/* Name */}
-              <Input
-                type="text"
-                placeholder="Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-
-              {/* Bio */}
-              <Input
-                type="text"
-                placeholder="Bio"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-              />
-
-              {/* Social Media Links */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  type="text"
-                  placeholder="Instagram URL"
-                  value={instagram}
-                  onChange={(e) => setInstagram(e.target.value)}
-                />
-                <Input
-                  type="text"
-                  placeholder="Twitter URL"
-                  value={twitter}
-                  onChange={(e) => setTwitter(e.target.value)}
-                />
-                <Input
-                  type="text"
-                  placeholder="GitHub URL"
-                  value={github}
-                  onChange={(e) => setGithub(e.target.value)}
-                />
-                <Input
-                  type="text"
-                  placeholder="LinkedIn URL"
-                  value={linkedin}
-                  onChange={(e) => setLinkedin(e.target.value)}
-                />
-              </div>
-
-              {/* Submit Button */}
-              <Button type="submit" className="w-full">
-                Save Changes
-              </Button>
-            </form>
-
-            {/* Success/Error Message */}
-            {message && (
-              <p
-                className={`mt-4 text-center ${
-                  message.includes("successfully") ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                {message}
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+    <div className="flex-grow flex flex-col items-center justify-center p-6 ">
+    <Card className="flex flex-col items-center text-center p-6 space-y-6">
+      <CardHeader className="flex flex-col items-center">
+        {/* Profile Picture */}
+        <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-2 border-gray-200">
+          <img
+            src={profilePicture || "https://via.placeholder.com/150"}
+            alt={name || "Profile Picture"}
+            className="w-full h-full object-cover"
+          />
+        </div>
+        {/* Name */}
+        <h2 className="text-xl font-semibold">{name || "Name not provided"}</h2>
+        {/* Email */}
+        <p className="text-sm text-gray-600">{email || "Email not provided"}</p>
+        {/* Bio */}
+        <p className="text-sm text-gray-700 mt-2">{bio || "No bio available"}</p>
+      </CardHeader>
+      <CardContent>
+        {/* Social Media Links */}
+        <div className="flex justify-center space-x-4 mb-4">
+          {socialMedia?.twitter && (
+            <a
+              href={socialMedia.twitter}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-500"
+            >
+              <FaTwitter className="w-6 h-6" />
+            </a>
+          )}
+          {socialMedia?.linkedin && (
+            <a
+              href={socialMedia.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-700"
+            >
+              <FaLinkedin className="w-6 h-6" />
+            </a>
+          )}
+          {socialMedia?.github && (
+            <a
+              href={socialMedia.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-800 hover:text-gray-900"
+            >
+              <FaGithub className="w-6 h-6" />
+            </a>
+          )}
+          {socialMedia?.instagram && (
+            <a
+              href={socialMedia.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-pink-600 hover:text-pink-700"
+            >
+              <FaInstagram className="w-6 h-6" />
+            </a>
+          )}
+        </div>
+        {/* Member Since */}
+        <p className="text-sm text-gray-500 mb-4">
+          Member since {createdAt ? formattedDate : "Unknown date"}
+        </p>
+        {/* Action Buttons */}
+        <div className="flex justify-center space-x-4">
+          <Link to="/edit-profile">
+          <Button  className="bg-blue-500 text-white hover:bg-blue-600">
+            Edit Profile
+          </Button>
+          </Link>
+          <Button
+            onClick={handleDeleteProfile}
+            className="bg-red-500 text-white hover:bg-red-600"
+          >
+            Delete Profile
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
     </div>
   );
 };

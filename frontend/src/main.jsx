@@ -13,6 +13,7 @@ import Error from "./pages/Error";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Contact from "./pages/Contact";
 import CreateProfile from "./pages/CreateProfile";
+import EditProfile from "./pages/EditProfile";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
         element: <Register />,
       },
 
+      {
+        path: "edit-profile",
+        element: <EditProfile />,
+      },
       {
         path: "profile",
         element: <Profile />,
