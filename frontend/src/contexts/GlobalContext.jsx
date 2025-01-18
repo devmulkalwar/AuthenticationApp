@@ -219,7 +219,7 @@ export const ContextProvider = ({ children }) => {
         const message = response.data.message;
         setMessage(message);
         handleToast(message, "success");
-        navigate("/dashboard");
+        navigate("/");
       } else {
         throw new Error("Unexpected response from the server");
       }

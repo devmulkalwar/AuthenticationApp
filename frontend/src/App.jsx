@@ -15,21 +15,20 @@ function App() {
           <Outlet />
         </main>
         <Footer />
+        <ToastContainer
+          position="top-center"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          transition={Bounce} // Pass Bounce correctly as a prop
+        />
       </div>
-
-      <ToastContainer
-        position="top-center"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        transition={Bounce} // Pass Bounce correctly as a prop
-      />
     </ContextProvider>
   );
 }

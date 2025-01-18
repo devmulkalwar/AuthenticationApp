@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import axios from "axios";  // assuming you're using axios for API requests
+import { useGlobalContext } from "@/hooks/useGlobalContext";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const Profile = () => {
+  const { user, editProfile } = useGlobalContext();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [bio, setBio] = useState("");
@@ -16,9 +17,52 @@ const Profile = () => {
   const [linkedin, setLinkedin] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  // Track the initial values for comparison
+  const [initialValues, setInitialValues] = useState({});
+
+  // Function to compare current state with initial values
+  const hasChanges = () => {
+    return (
+      name !== initialValues.name ||
+      email !== initialValues.email ||
+      bio !== initialValues.bio ||
+      instagram !== initialValues.instagram ||
+      twitter !== initialValues.twitter ||
+      github !== initialValues.github ||
+      linkedin !== initialValues.linkedin ||
+      profilePicture !== initialValues.profilePicture
+    );
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("Profile updated successfully!");
+
+    if (!hasChanges()) {
+      setMessage("No changes detected.");
+      return; // Don't submit if there are no changes
+    }
+
+    // Create FormData object
+    const formData = new FormData();
+    formData.append("userId", user._id);
+    formData.append("fullName", name);
+    formData.append("bio", bio);
+    formData.append("socialMedia[github]", github);
+    formData.append("socialMedia[instagram]", instagram);
+    formData.append("socialMedia[linkedin]", linkedin);
+    formData.append("socialMedia[twitter]", twitter);
+
+    // Append the profile picture to formData if available
+    if (profilePicture) {
+      formData.append("profilePicture", profilePicture);
+    }
+
+    try {
+      await editProfile(formData);
+      setMessage("Profile updated successfully!");
+    } catch (error) {
+      setMessage("Error occurred while updating profile.");
+    }
   };
 
   const handleProfilePictureChange = (e) => {
@@ -26,24 +70,45 @@ const Profile = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        console.log("FileReader result:", reader.result); // Debugging
         setProfilePicture(reader.result);
       };
       reader.readAsDataURL(file);
     } else {
-      console.log("No file selected"); // Debugging
+      console.log("No file selected");
     }
   };
 
   useEffect(() => {
-    console.log("Profile Picture Updated:", profilePicture); // Debugging
-  }, [profilePicture]);
+    if (user) {
+      // Initialize form state and store initial values for comparison
+      setName(user.fullName);
+      setEmail(user.email);  // Make sure the email is tracked
+      setBio(user.bio);
+      setProfilePicture(user.profilePicture);
+      setInstagram(user.socialMedia.instagram);
+      setTwitter(user.socialMedia.twitter);
+      setGithub(user.socialMedia.github);
+      setLinkedin(user.socialMedia.linkedin);
+
+      // Set initial values for comparison later
+      setInitialValues({
+        name: user.fullName,
+        email: user.email,  // Ensure email is included in the initial values
+        bio: user.bio,
+        profilePicture: user.profilePicture,
+        instagram: user.socialMedia.instagram,
+        twitter: user.socialMedia.twitter,
+        github: user.socialMedia.github,
+        linkedin: user.socialMedia.linkedin
+      });
+    }
+  }, [user]);
 
   return (
     <div className="flex flex-grow w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="w-full max-w-4xl">
         {/* Edit Profile Section */}
-        <Card className={cn("flex flex-col gap-6")}>
+        <Card className="flex flex-col gap-6">
           <CardHeader>
             <CardTitle className="text-center">Edit Profile</CardTitle>
             <CardDescription className="text-center">
@@ -82,15 +147,6 @@ const Profile = () => {
                 placeholder="Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                required
-              />
-
-              {/* Email */}
-              <Input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 required
               />
 
@@ -146,75 +202,6 @@ const Profile = () => {
                 {message}
               </p>
             )}
-          </CardContent>
-        </Card>
-
-        {/* Profile Preview Section */}
-        <Card className={cn("flex flex-col gap-6")}>
-          <CardHeader>
-            <CardTitle className="text-center">Profile Preview</CardTitle>
-            <CardDescription className="text-center">
-              This is how your profile will look to others.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center gap-4">
-            {/* Profile Picture */}
-            <div className="w-32 h-32 border-2 border-red-500 rounded-full overflow-hidden">
-              <img
-                src={profilePicture || "https://via.placeholder.com/150"}
-                alt="Profile Picture"
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* Name */}
-            <h2 className="text-2xl font-semibold">{name || "Your Name"}</h2>
-
-            {/* Email */}
-            <p className="text-sm text-gray-600">{email || "your.email@example.com"}</p>
-
-            {/* Bio */}
-            <p className="text-center text-gray-700">{bio || "A short bio about yourself."}</p>
-
-            {/* Social Media Links */}
-            <div className="flex gap-4">
-              {instagram && (
-                <a href={instagram} target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="https://img.icons8.com/fluent/48/000000/instagram-new.png"
-                    alt="Instagram"
-                    className="w-6 h-6"
-                  />
-                </a>
-              )}
-              {twitter && (
-                <a href={twitter} target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="https://img.icons8.com/fluent/48/000000/twitter.png"
-                    alt="Twitter"
-                    className="w-6 h-6"
-                  />
-                </a>
-              )}
-              {github && (
-                <a href={github} target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="https://img.icons8.com/fluent/48/000000/github.png"
-                    alt="GitHub"
-                    className="w-6 h-6"
-                  />
-                </a>
-              )}
-              {linkedin && (
-                <a href={linkedin} target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="https://img.icons8.com/fluent/48/000000/linkedin.png"
-                    alt="LinkedIn"
-                    className="w-6 h-6"
-                  />
-                </a>
-              )}
-            </div>
           </CardContent>
         </Card>
       </div>

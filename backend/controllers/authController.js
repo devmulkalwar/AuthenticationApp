@@ -323,7 +323,7 @@ export const createProfile = async (req, res) => {
 
 // Update profile
 export const updateProfile = async (req, res) => {
-  const { userId, fullName, socialMedia } = req.body;
+  const { userId, fullName,bio, socialMedia } = req.body;
   const profilePictureFile = req.file; // Assuming file upload middleware like multer is used
 
   let profilePictureUrl = null;
@@ -345,13 +345,26 @@ export const updateProfile = async (req, res) => {
     if (profilePictureFile) {
       tempFilePath = profilePictureFile.path; // Get the temporary file path
       const cloudinaryResult = await uploadOnCloudinary(tempFilePath); // Upload file to Cloudinary
+
+      if (cloudinaryResult.error) {
+        return res.status(500).json({
+          success: false,
+          message: "Error uploading profile picture to Cloudinary",
+        });
+      }
       profilePictureUrl = cloudinaryResult.url; // Extract URL from Cloudinary response
     }
 
     // Update the user's fields only if new data is provided
-    user.fullName = fullName || user.fullName;
-    user.profilePicture = profilePictureUrl || user.profilePicture;
-    user.socialMedia = socialMedia || user.socialMedia;
+    user.fullName = fullName || user.fullName;  
+    user.bio = bio || user.bio ; // Only update if new name is provided
+    user.profilePicture = profilePictureUrl || user.profilePicture; // Update picture if uploaded
+    if (socialMedia) {
+      if (socialMedia.instagram) user.socialMedia.instagram = socialMedia.instagram;
+      if (socialMedia.twitter) user.socialMedia.twitter = socialMedia.twitter;
+      if (socialMedia.github) user.socialMedia.github = socialMedia.github;
+      if (socialMedia.linkedin) user.socialMedia.linkedin = socialMedia.linkedin;
+    }  // Update social media links if provided
 
     // Save the updated user document
     await user.save();

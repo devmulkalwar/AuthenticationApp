@@ -24,12 +24,7 @@ const CreateProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const socialMedia = {
-      instagram: instagram,
-      twitter: twitter,
-      github: github,
-      linkedin: linkedin,
-    };
+  
     // Create FormData object
     const formData = new FormData();
     formData.append("userId", user._id);
