@@ -68,7 +68,7 @@ export function RegisterForm({ className, ...props }) {
                 </div>
                 <Input
                   id="password"
-                  name="password" // Add a name attribute to identify the field
+                  name="password" 
                   type="password"
                   required
                 />

@@ -10,6 +10,7 @@ const SERVER_URL = "http://localhost:3000/api/auth";
 export const ContextProvider = ({ children }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [users, setUsers] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(false);
@@ -41,23 +42,23 @@ export const ContextProvider = ({ children }) => {
     setIsLoading(true);
     setMessage(null);
     setError(null);
-  
+
     try {
       const response = await axios.post(`${SERVER_URL}/register`, data, {
-        withCredentials: true, 
+        withCredentials: true,
       });
-  
+
       console.log(response);
-  
+
       // Handle successful response
       const user = response.data.user;
       const message = response.data.message;
-  
+
       // Set user and message
       setUser(user);
       setMessage(message);
       setIsAuthenticated(true);
-  
+
       // Navigate to the OTP verification page
       navigate("/verify-otp"); // Adjust the route as per your app
     } catch (err) {
@@ -70,24 +71,16 @@ export const ContextProvider = ({ children }) => {
       setIsLoading(false);
     }
   };
-  
 
   // Login function
-  const login = async (email, password) => {
+  const login = async (data) => {
     setIsLoading(true);
     setMessage(null);
     setError(null);
     try {
-      const response = await axios.post(
-        `${SERVER_URL}/login`,
-        {
-          email,
-          password,
-        },
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await axios.post(`${SERVER_URL}/login`, data, {
+        withCredentials: true,
+      });
       console.log(response);
 
       // Handle successful response
@@ -257,6 +250,7 @@ export const ContextProvider = ({ children }) => {
       // Update user and authentication status based on the response
       if (response.data.user) {
         setUser(response.data.user);
+        getAllUsers(user._id);
         setIsAuthenticated(true);
       } else {
         setUser(null);
@@ -423,6 +417,38 @@ export const ContextProvider = ({ children }) => {
     }
   };
 
+  // Get all users
+  const getAllUsers = async (userId) => {
+    setIsLoading(true);
+    setMessage(null);
+    setError(null);
+    try {
+      const response = await axios.get(
+        `${SERVER_URL}/get-all-users`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+
+      console.log(response);
+
+      const users = response.data.users;
+      const loggedInUserId = "678a8b9c5742421e1df4a0ec"; // Replace with actual logged-in user's ID
+
+      // Filter out the logged-in user
+      const filteredUsers = users.filter((user) => user._id !== loggedInUserId);
+      setUsers(filteredUsers);
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.message || "Error in fetching users";
+      setError(errorMessage);
+      console.error("Error fetching users:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Execute checkAuth when the component mounts
   useEffect(() => {
     checkAuth();
@@ -430,6 +456,7 @@ export const ContextProvider = ({ children }) => {
 
   // Memoize the context value to avoid unnecessary re-renders
   const contextValue = {
+    users,
     user,
     setUser,
     isAuthenticated,
@@ -453,6 +480,7 @@ export const ContextProvider = ({ children }) => {
     changePassword,
     createProfile,
     editProfile,
+    getAllUsers,
   };
 
   return (
@@ -461,5 +489,3 @@ export const ContextProvider = ({ children }) => {
     </GlobalContext.Provider>
   );
 };
-
-

@@ -10,8 +10,31 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
+import { useRef } from "react";
+import { useGlobalContext } from "@/hooks/useGlobalContext";
 
 export function LoginForm({ className, ...props }) {
+  const { login } = useGlobalContext();
+  const formRef = useRef(null);
+
+  const handleSubmit = (event) => {
+    event.preventDefault(); // Prevent default form submission
+
+    // Access form data
+    const formData = new FormData(formRef.current);
+
+    // Convert form data to a plain object
+    const data = {};
+    formData.forEach((value, key) => {
+      data[key] = value;
+    });
+
+    // Log the form data to the console
+    console.log("Form Data:", data);
+   
+      login(data);
+    
+  };
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -22,13 +45,14 @@ export function LoginForm({ className, ...props }) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form ref={formRef} onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
+                  name="email"
                   placeholder="m@example.com"
                   required
                 />
@@ -43,12 +67,11 @@ export function LoginForm({ className, ...props }) {
                     Forgot your password?
                   </Link>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" type="password" name="password" required />
               </div>
               <Button type="submit" className="w-full">
                 Login
               </Button>
-             
             </div>
             <div className="mt-4 text-center text-sm">
               Don't have an account?{" "}

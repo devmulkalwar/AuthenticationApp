@@ -400,14 +400,10 @@ export const deleteProfile = async (req, res) => {
 };
 
 export const getAllUsers = async (req, res) => {
-  const { userId } = req.body;
   try {
-    // Assuming req.user contains the logged-in user's details
-    const loggedInUserId = userId;
-
-    // Exclude the logged-in user from the query result
-    const users = await User.find({ _id: { $ne: loggedInUserId } });
-
+     
+    const users = await User.find();
+    console.log( users);
     res.status(200).json({ success: true, users });
   } catch (error) {
     console.error("Error in getAllUsers:", error);

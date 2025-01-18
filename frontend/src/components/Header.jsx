@@ -10,8 +10,11 @@ import {
   AuthButtons,
 } from "@/components/ui/Navbar";
 import { Link } from "react-router-dom";
+import { Button } from "./ui/button";
+import { useGlobalContext } from "@/hooks/useGlobalContext";
 
 const Header = () => {
+  const { isAuthenticated, logout, user } = useGlobalContext(); // Replace with your authentication logic
   const [isOpen, setIsOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -32,6 +35,10 @@ const Header = () => {
     }
   }, [isDarkMode]);
 
+  const handleLogout = () => {
+    logout();
+    alert("Logged out successfully");
+  };
   return (
     <Navbar>
       <NavbarHeader>
@@ -84,9 +91,15 @@ const Header = () => {
             </NavbarLinks>
 
             {/* Auth Buttons (Third item from the right) */}
-            <div className="flex items-center space-x-4">
-              <AuthButtons />
-            </div>
+            {!isAuthenticated ? (
+              <div className="flex items-center space-x-4">
+                <AuthButtons />
+              </div>
+            ) : (
+              <Button variant="destructive" onClick={handleLogout}>
+                Logout
+              </Button>
+            )}
 
             {/* Theme Toggle (Beside the avatar) */}
             <button onClick={toggleTheme} className="p-2">
@@ -125,7 +138,7 @@ const Header = () => {
 
             {/* Profile Avatar (Rightmost side) */}
             <ProfileAvatar
-              src="https://via.placeholder.com/150" // Replace with your profile image URL
+              src={user?.profilePicture || "https://via.placeholder.com/150"} // Use optional chaining for safety
               alt="Profile"
             />
           </NavbarMenu>
@@ -169,7 +182,7 @@ const Header = () => {
 
             {/* Profile Avatar */}
             <ProfileAvatar
-              src="https://via.placeholder.com/150" // Replace with your profile image URL
+              src={user?.profilePicture || "https://via.placeholder.com/150"} // Use optional chaining for safety
               alt="Profile"
             />
           </div>
@@ -189,9 +202,15 @@ const Header = () => {
             <NavbarLink to="/contact" className="block">
               Contact
             </NavbarLink>
-            <div className="pt-4">
-              <AuthButtons />
-            </div>
+            {!isAuthenticated ? (
+              <div className="pt-4">
+                <AuthButtons />
+              </div>
+            ) : (
+              <Button variant="destructive" onClick={handleLogout}>
+                Logout
+              </Button>
+            )}
           </div>
         </div>
       )}
