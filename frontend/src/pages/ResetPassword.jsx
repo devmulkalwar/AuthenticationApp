@@ -1,26 +1,33 @@
 import React, { useState } from "react";
+import { useParams } from "react-router-dom"; // To extract URL parameters
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input"; // Assuming you have an Input component
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils"; // Utility for className merging
+import { useGlobalContext } from "@/hooks/useGlobalContext";
 
 const ResetPassword = () => {
+  const{resetPassword} = useGlobalContext();
+  const { token } = useParams(); // Extract the token from the URL
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Replace this with your actual logic (e.g., API call to reset password)
-    if (newPassword && confirmPassword) {
-      if (newPassword === confirmPassword) {
-        setMessage("Your password has been reset successfully!");
-      } else {
-        setMessage("Passwords do not match. Please try again.");
-      }
-    } else {
+
+    if (!newPassword || !confirmPassword) {
       setMessage("Please fill in both fields.");
+      return;
     }
+
+    if (newPassword !== confirmPassword) {
+      setMessage("Passwords do not match. Please try again.");
+      return;
+    }
+
+    await resetPassword(token, newPassword)
   };
 
   return (
@@ -41,6 +48,7 @@ const ResetPassword = () => {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
+                disabled={loading}
               />
               <Input
                 type="password"
@@ -48,9 +56,10 @@ const ResetPassword = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
+                disabled={loading}
               />
-              <Button type="submit" className="w-full">
-                Reset Password
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Resetting..." : "Reset Password"}
               </Button>
             </form>
             {message && (

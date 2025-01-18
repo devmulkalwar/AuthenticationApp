@@ -1,21 +1,30 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input"; // Assuming you have an Input component
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils"; // Utility for className merging
+import { useGlobalContext } from "@/hooks/useGlobalContext";
 
 const ForgotPassword = () => {
+  const { forgotPassword, setError, user, setMessage } = useGlobalContext();
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false); // Added loading state for better UX
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Replace this with your actual logic (e.g., API call to send reset password email)
-    if (email) {
-      setMessage(`Reset password link has been sent to ${email}.`);
-    } else {
-      setMessage("Please enter a valid email address.");
+
+    if (!email) {
+      setError("Please enter a valid email address.");
+      handleToast("Please enter a valid email address.");
+      return;
     }
+    forgotPassword(email);
+    
   };
 
   return (
@@ -36,20 +45,13 @@ const ForgotPassword = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={loading} // Disable input while submitting
               />
-              <Button type="submit" className="w-full">
-                Submit
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Sending..." : "Submit"}{" "}
+                {/* Button shows loading state */}
               </Button>
             </form>
-            {message && (
-              <p
-                className={`mt-4 text-center ${
-                  message.includes("sent") ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                {message}
-              </p>
-            )}
           </div>
         </Card>
       </div>
