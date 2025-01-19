@@ -17,7 +17,7 @@ const Header = () => {
   const { isAuthenticated, logout, user } = useGlobalContext(); // Replace with your authentication logic
   const [isOpen, setIsOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-
+  const [currentUser, setCurrentUser] = useState(null);
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
@@ -26,7 +26,12 @@ const Header = () => {
     setIsDarkMode(!isDarkMode);
   };
 
-  // Apply dark mode class to the body element
+  useEffect(() => {
+    if (user) {
+      setCurrentUser(user);
+    }
+  }, [user]);
+ 
   useEffect(() => {
     if (isDarkMode) {
       document.body.classList.add("dark");
@@ -38,7 +43,7 @@ const Header = () => {
   const handleLogout = async () => {
     await logout();
   };
-  
+
   return (
     <Navbar>
       <NavbarHeader>
@@ -86,7 +91,9 @@ const Header = () => {
           <NavbarMenu className="order-3 hidden md:flex">
             <NavbarLinks>
               <NavbarLink to="/">Home</NavbarLink>
-              <NavbarLink to="/profile">Profile</NavbarLink>
+              <NavbarLink to={`/profile/${currentUser?._id || ""}`}>
+                Profile
+              </NavbarLink>
               <NavbarLink to="/contact">Contact</NavbarLink>
             </NavbarLinks>
 
@@ -138,7 +145,7 @@ const Header = () => {
 
             {/* Profile Avatar (Rightmost side) */}
             <ProfileAvatar
-              src={user?.profilePicture || "https://via.placeholder.com/150"} // Use optional chaining for safety
+              src={currentUser?.profilePicture || "https://via.placeholder.com/150"} // Use optional chaining for safety
               alt="Profile"
             />
           </NavbarMenu>
@@ -182,7 +189,7 @@ const Header = () => {
 
             {/* Profile Avatar */}
             <ProfileAvatar
-              src={user?.profilePicture || "https://via.placeholder.com/150"} // Use optional chaining for safety
+              src={currentUser?.profilePicture || "https://via.placeholder.com/150"} // Use optional chaining for safety
               alt="Profile"
             />
           </div>
@@ -196,7 +203,7 @@ const Header = () => {
             <NavbarLink to="/" className="block">
               Home
             </NavbarLink>
-            <NavbarLink to="/profile" className="block">
+            <NavbarLink to={`/profile/${currentUser?._id || ""}`} className="block">
               Profile
             </NavbarLink>
             <NavbarLink to="/contact" className="block">
