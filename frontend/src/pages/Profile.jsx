@@ -2,13 +2,27 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FaTwitter, FaLinkedin, FaGithub, FaInstagram, FaShare } from "react-icons/fa";
+import {
+  FaTwitter,
+  FaLinkedin,
+  FaGithub,
+  FaInstagram,
+  FaShare,
+} from "react-icons/fa";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const Profile = () => {
-  const { user, deleteProfile, changePassword, handleToast, setErrorMessage, users } = useGlobalContext();
+  const {
+    user,
+    deleteProfile,
+    changePassword,
+    handleToast,
+    setErrorMessage,
+    users,
+    isAuthenticated,
+  } = useGlobalContext();
   const { id } = useParams(); // Get user ID from URL params
   const [currentUser, setCurrentUser] = useState(null);
   const [usersArray, setUsersArray] = useState([]);
@@ -27,6 +41,7 @@ const Profile = () => {
     }
   }, [user]);
 
+ 
   // Effect to set the users array
   useEffect(() => {
     if (users) {
@@ -51,15 +66,15 @@ const Profile = () => {
 
   // Toggle "no-scroll" class when modals are open
   useEffect(() => {
-    document.body.classList.toggle("no-scroll", showDeleteModal || showChangePasswordModal);
+    document.body.classList.toggle(
+      "no-scroll",
+      showDeleteModal || showChangePasswordModal
+    );
     return () => {
       document.body.classList.remove("no-scroll");
     };
   }, [showDeleteModal, showChangePasswordModal]);
 
-  if (!currentUser) {
-    return <Navigate to="/login" replace />;
-  }
   // Display a message if no user data is found
   if (!owner) {
     return (
@@ -68,7 +83,6 @@ const Profile = () => {
       </p>
     );
   }
-  
 
   const {
     fullName: name = "Name not provided",
@@ -94,7 +108,9 @@ const Profile = () => {
       setShowDeleteModal(false);
     } catch (error) {
       console.error("Error deleting profile:", error);
-      alert("Failed to delete profile. Please ensure your password is correct.");
+      alert(
+        "Failed to delete profile. Please ensure your password is correct."
+      );
     }
   };
 

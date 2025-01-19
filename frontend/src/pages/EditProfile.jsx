@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 
 
 const EditProfile = () => {
-  const { user, editProfile,handleToast } = useGlobalContext();
+  const { user, editProfile,handleToast,isAuthenticated,setIsAuthenticated } = useGlobalContext();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [bio, setBio] = useState("");
@@ -25,6 +25,7 @@ const EditProfile = () => {
       setCurrentUser(user);
     }
   }, [user]);
+
 
   // Function to compare current state with initial values
   const hasChanges = () => {
@@ -106,10 +107,7 @@ const EditProfile = () => {
     }
   }, [user]);
 
-  
-  if (!currentUser) {
-    return <Navigate to="/login" replace />;
-  }
+
   
   return (
     <div className="flex flex-grow w-full items-center justify-center p-6 md:p-10">

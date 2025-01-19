@@ -13,18 +13,20 @@ import { FaSearch } from "react-icons/fa";
 import { Navigate } from "react-router-dom";
 
 const Home = () => {
-  const { users, getAllUsers, user } = useGlobalContext();
+  const { users, user,isAuthenticated } = useGlobalContext();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [usersArray, setUsersArray] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
+
   useEffect(() => {
     if (user) {
       setCurrentUser(user);
     }
   }, [user]);
+
   useEffect(() => {
     if (users) {
       setUsersArray(users);
@@ -70,10 +72,6 @@ const Home = () => {
     );
   }
 
-  
-  if (!currentUser) {
-    return <Navigate to="/login" replace />;
-  }
   return (
     <div className="flex flex-col w-full items-center justify-center p-4 md:p-6 lg:p-8 min-h-screen">
       {/* Page Heading */}

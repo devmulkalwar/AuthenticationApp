@@ -1,24 +1,22 @@
-import React, { useEffect, useState } from "react";
-import { Navigate, Outlet } from "react-router-dom";
-import { useGlobalContext } from "@/hooks/useGlobalContext"; // Adjust the import path
+import React, { useEffect } from "react";
+import { Navigate } from "react-router-dom";
 
-const ProtectedRoute = () => {
-  const { user } = useGlobalContext(); // Get user from global context
-  const[currentUser,setCurrentUser] = useState(null);
+const ProtectedRoute = ({ children }) => {
+  const storedUser = localStorage.getItem("user");
+  const isAuthenticated = storedUser ? true : false;
 
-    useEffect(() => {
-        if(user){
-            setCurrentUser(user);
-        }
-    },[user])
+  useEffect(() => {
+    if (!storedUser) {
+      // Optionally, you can add logging or state updates here
+      console.log("No stored user found. Redirecting to login...");
+    }
+  }, [storedUser]);
 
-  // If the user is not authenticated, redirect to the login page
-  if (!currentUser) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  // If the user is authenticated, render the requested component
-  return <Outlet />;
+  return children; // Render the protected component
 };
 
 export default ProtectedRoute;

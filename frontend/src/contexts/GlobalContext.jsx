@@ -56,16 +56,19 @@ export const ContextProvider = ({ children }) => {
       const user = response.data.user;
       const message = response.data.message;
   
-      // Set user and message
+      // Set user and authentication state
       setUser(user);
       setMessage(message);
       setIsAuthenticated(true);
+  
+      // Save user data to localStorage
+      localStorage.setItem("user", JSON.stringify(user));
   
       // Display success toast
       handleToast("Registration successful! Please verify your OTP.", "success");
   
       // Navigate to the OTP verification page
-      navigate("/verify-otp"); 
+      navigate("/verify-otp");
     } catch (err) {
       console.error(err);
       const errorMessage = err.response?.data?.message || "Registration failed";
@@ -74,12 +77,13 @@ export const ContextProvider = ({ children }) => {
       // Display error toast
       handleToast(errorMessage, "error");
   
-      throw err; 
+      throw err; // Propagate the error if needed
     } finally {
       // Stop loading spinner
       setIsLoading(false);
     }
   };
+  
   
 // Login function
 const login = async (data) => {
@@ -98,17 +102,19 @@ const login = async (data) => {
     const user = response.data.user;
     const message = response.data.message;
 
-    // Set user and message
+    // Set user and authentication state
     setUser(user);
     setMessage(message);
     setIsAuthenticated(true);
+
+    // Save user data to localStorage
+    localStorage.setItem("user", JSON.stringify(user));
 
     // Display success toast
     handleToast("Login successful!", "success");
 
     // Navigate to the home page
     navigate("/");
-
   } catch (err) {
     console.error(err);
     const errorMessage = err.response?.data?.message || "Login failed";
@@ -117,14 +123,12 @@ const login = async (data) => {
     // Display error toast
     handleToast(errorMessage, "error");
 
-    // Navigate to login page in case of error (you can remove this part if not required)
-    navigate("/login");
-    
     throw err; // Re-throw error if needed
   } finally {
     setIsLoading(false);
   }
 };
+
 
 
 // Logout function
@@ -146,12 +150,14 @@ const logout = async () => {
     setUser(null);
     setIsAuthenticated(false);
 
+    // Remove user data from localStorage
+    localStorage.removeItem("user");
+
     // Display success toast
     handleToast("Logged out successfully!", "success");
 
     // Navigate to the login page
     navigate("/login");
-
   } catch (err) {
     console.error(err);
     const errorMessage = err.response?.data?.message || "Error in Logout";
@@ -165,7 +171,6 @@ const logout = async () => {
     setIsLoading(false);
   }
 };
-
 
 // Email Verification function
 const verifyEmail = async (code) => {
@@ -288,29 +293,50 @@ const editProfile = async (formData) => {
   const checkAuth = async () => {
     setIsCheckingAuth(true);
     setError(null);
-
+  
     try {
-      const response = await axios.get(`${SERVER_URL}/check-auth`, {
-        withCredentials: true,
-      });
-
-      // Log the response for debugging
-      console.log("Check Auth Response:", response);
-
-      // Update user and authentication status based on the response
-      if (response.data.user) {
-        setUser(response.data.user);
-        console.log(response.data.user._id);
-        getAllUsers(response.data.user._id);
+      // Check if user data exists in localStorage
+      const storedUser = localStorage.getItem("user");
+  
+      if (storedUser) {
+        // Parse the user data and update the state
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
         setIsAuthenticated(true);
+  
+        // Optionally, call getAllUsers if needed
+        getAllUsers(parsedUser._id);
+  
+        console.log("User data retrieved from localStorage:", parsedUser);
       } else {
-        setUser(null);
-        setIsAuthenticated(false);
+        // If no user data is found in localStorage, make the backend request
+        const response = await axios.get(`${SERVER_URL}/check-auth`, {
+          withCredentials: true,
+        });
+  
+        console.log("Check Auth Response:", response);
+  
+        // Update user and authentication status based on the response
+        if (response.data.user) {
+          const user = response.data.user;
+  
+          setUser(user);
+          setIsAuthenticated(true);
+  
+          // Save user data to localStorage for future use
+          localStorage.setItem("user", JSON.stringify(user));
+  
+          console.log(user._id);
+          getAllUsers(user._id);
+        } else {
+          setUser(null);
+          setIsAuthenticated(false);
+        }
       }
     } catch (err) {
       // Log error for debugging
       console.error("Check Auth Error:", err);
-
+  
       // Handle errors
       setUser(null);
       setIsAuthenticated(false);
@@ -321,6 +347,7 @@ const editProfile = async (formData) => {
       setIsCheckingAuth(false);
     }
   };
+  
 
  // Forgot Password function
 const forgotPassword = async (email) => {
@@ -471,7 +498,7 @@ const deleteProfile = async (password, userId) => {
   // Execute checkAuth when the component mounts
   useEffect(() => {
     checkAuth();
-  }, []);
+  },[]);
 
   // Memoize the context value to avoid unnecessary re-renders
   const contextValue = {

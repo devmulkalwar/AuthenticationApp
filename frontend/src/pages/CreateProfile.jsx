@@ -13,7 +13,7 @@ import { useGlobalContext } from "@/hooks/useGlobalContext";
 import { Navigate } from "react-router-dom";
 
   const CreateProfile = () => {
-  const { createProfile, user } = useGlobalContext();
+  const { createProfile, user,isAuthenticated } = useGlobalContext();
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [profilePicture, setProfilePicture] = useState(null); // Use null initially
@@ -29,6 +29,7 @@ import { Navigate } from "react-router-dom";
       
     }
   }, [user]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -15,7 +15,7 @@ import { useGlobalContext } from "@/hooks/useGlobalContext";
 import { Navigate } from "react-router-dom";
 
 const Contact = () => {
-  const { user, handleToast } = useGlobalContext(); // Access user data from context
+  const { user, handleToast,isAuthenticated } = useGlobalContext(); // Access user data from context
   const form = useRef(); // Create form ref
   const [email, setEmail] = useState(""); // Initialize email state
   const [subject, setSubject] = useState("");
@@ -29,7 +29,6 @@ const Contact = () => {
       setEmail(user.email);
     }
   }, [user]);
-
   
   // Handle form submission
   const handleSubmit = (e) => {
@@ -68,10 +67,9 @@ const Contact = () => {
         }
       );
   };
+  
 
-  if (!currentUser) {
-    return <Navigate to="/login" replace />;
-  }
+
   return (
     <div className="flex flex-grow w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-2xl">

@@ -190,7 +190,7 @@ const Header = () => {
 
             {/* Profile Avatar */}
             <ProfileAvatar
-              src={currentUser?.profilePicture || "https://via.placeholder.com/150"} // Use optional chaining for safety
+              src={currentUser?.profilePicture || defaultProfile} // Use optional chaining for safety
               alt="Profile"
             />
           </div>

@@ -14,6 +14,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Contact from "./pages/Contact";
 import CreateProfile from "./pages/CreateProfile";
 import EditProfile from "./pages/EditProfile";
+import ProtectedRoute from "./components/ProtectedRoutes";
 
 const router = createBrowserRouter([
   {
@@ -23,7 +24,11 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Home />,
+        element: (
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "login",
@@ -36,11 +41,19 @@ const router = createBrowserRouter([
 
       {
         path: "edit-profile",
-        element: <EditProfile />,
+        element: (
+          <ProtectedRoute>
+            <EditProfile />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "profile/:id",
-        element: <Profile />,
+        element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "verify-otp",
@@ -57,11 +70,19 @@ const router = createBrowserRouter([
 
       {
         path: "contact",
-        element: <Contact />,
+        element: (
+          <ProtectedRoute>
+            <Contact />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "create-profile",
-        element: <CreateProfile />,
+        element: (
+          <ProtectedRoute>
+            <CreateProfile />
+          </ProtectedRoute>
+        ),
       },
     ],
   },
