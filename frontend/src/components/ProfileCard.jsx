@@ -4,6 +4,7 @@ import { FaTwitter, FaLinkedin, FaGithub, FaInstagram } from "react-icons/fa";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns"; // Import date-fns for date formatting
 import { Link } from "react-router-dom";
+import { Button } from "./ui/button";
 
 const ProfileCard = ({
   profilePicture,
@@ -88,9 +89,11 @@ const ProfileCard = ({
           <div className="mt-4">
             <Link
               to={`/profile/${_id || ""}`}
-              className="inline-block bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
             >
+              <Button varient="primary">
+
               View Profile
+              </Button>
             </Link>
         </div>
       </CardContent>

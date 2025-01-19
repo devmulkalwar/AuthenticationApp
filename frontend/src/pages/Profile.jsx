@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FaTwitter, FaLinkedin, FaGithub, FaInstagram } from "react-icons/fa";
+import { FaTwitter, FaLinkedin, FaGithub, FaInstagram, FaShare } from "react-icons/fa";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
 import { Link, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -111,6 +111,21 @@ const Profile = () => {
     }
   };
 
+  // Handle sharing the profile
+  const handleShareProfile = async () => {
+    const profileUrl = window.location.href; // Get the current profile URL
+    try {
+      await navigator.share({
+        title: `${name}'s Profile`,
+        text: `Check out ${name}'s profile!`,
+        url: profileUrl,
+      });
+    } catch (error) {
+      console.error("Error sharing profile:", error);
+      alert("Sharing is not supported on this device.");
+    }
+  };
+
   // Check if the current profile belongs to the logged-in user
   const isOwner = currentUser?._id === owner?._id;
 
@@ -131,7 +146,7 @@ const Profile = () => {
               <p className="text-sm text-muted-foreground">{email}</p>
               <p className="text-sm text-muted-foreground mt-2">{bio}</p>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex flex-col items-center">
               <div className="flex justify-center space-x-4 mb-4">
                 {socialMedia.twitter && (
                   <a
@@ -200,6 +215,17 @@ const Profile = () => {
                   </Button>
                 </div>
               )}
+              {/* Share Profile Button */}
+              <div className="flex justify-center mt-4">
+                <Button
+                  onClick={handleShareProfile}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <FaShare className="w-4 h-4" />
+                  Share Profile
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
