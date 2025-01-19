@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input"; // For consistent ShadCN styling
+import { Input } from "@/components/ui/input";
 import { FaTwitter, FaLinkedin, FaGithub, FaInstagram } from "react-icons/fa";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const Profile = () => {
-  const {
-    user,
-    deleteProfile,
-    changePassword,
-    handleToast,
-    setErrorMessage,
-  } = useGlobalContext(); // Assuming these actions exist in your context
+  const { user, deleteProfile, changePassword, handleToast, setErrorMessage, users } = useGlobalContext();
+  const { id } = useParams(); // Get user ID from URL params
   const [currentUser, setCurrentUser] = useState(null);
+  const [usersArray, setUsersArray] = useState([]);
+  const [owner, setOwner] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [password, setPassword] = useState("");
@@ -23,11 +20,34 @@ const Profile = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
+  // Effect to set the logged-in user
   useEffect(() => {
     if (user) {
       setCurrentUser(user);
     }
   }, [user]);
+
+  // Effect to set the users array
+  useEffect(() => {
+    if (users) {
+      setUsersArray(users);
+    }
+  }, [users]);
+
+  // Effect to find the profile for the viewed user by URL parameter
+  useEffect(() => {
+    if (id) {
+      console.log("Current User:", currentUser); // Debugging
+      console.log("Users Array:", usersArray); // Debugging
+
+      // Combine currentUser and usersArray for searching
+      const allUsers = currentUser ? [currentUser, ...usersArray] : usersArray;
+
+      const foundUser = allUsers.find((u) => u._id === id); // Search for user in combined array
+      console.log("Found User:", foundUser); // Debugging
+      setOwner(foundUser || null); // Set the user's data or null if not found
+    }
+  }, [id, usersArray, currentUser]);
 
   // Toggle "no-scroll" class when modals are open
   useEffect(() => {
@@ -37,7 +57,8 @@ const Profile = () => {
     };
   }, [showDeleteModal, showChangePasswordModal]);
 
-  if (!currentUser) {
+  // Display a message if no user data is found
+  if (!owner) {
     return (
       <p className="text-center text-muted-foreground">
         No user information available.
@@ -46,30 +67,30 @@ const Profile = () => {
   }
 
   const {
-    fullName: name,
-    email,
-    profilePicture,
-    bio,
-    socialMedia,
+    fullName: name = "Name not provided",
+    email = "Email not provided",
+    profilePicture = "https://via.placeholder.com/150",
+    bio = "No bio available",
+    socialMedia = {},
     createdAt,
-  } = currentUser;
+  } = owner;
 
-  const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const formattedDate = createdAt
+    ? new Date(createdAt).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : "Unknown date";
 
   const handleDeleteProfile = async () => {
     try {
-      await deleteProfile(password, user._id);
+      await deleteProfile(password, owner._id);
       alert("Profile deleted successfully.");
       setShowDeleteModal(false);
     } catch (error) {
       console.error("Error deleting profile:", error);
-      alert(
-        "Failed to delete profile. Please ensure your password is correct."
-      );
+      alert("Failed to delete profile. Please ensure your password is correct.");
     }
   };
 
@@ -81,7 +102,7 @@ const Profile = () => {
     }
 
     try {
-      await changePassword(user._id, oldPassword, newPassword);
+      await changePassword(owner._id, oldPassword, newPassword);
       alert("Password changed successfully.");
       setShowChangePasswordModal(false);
     } catch (error) {
@@ -89,6 +110,9 @@ const Profile = () => {
       alert("Failed to change password. Please check your old password.");
     }
   };
+
+  // Check if the current profile belongs to the logged-in user
+  const isOwner = currentUser?._id === owner?._id;
 
   return (
     <div className="flex flex-grow w-full items-center justify-center p-6">
@@ -98,24 +122,18 @@ const Profile = () => {
             <CardHeader className="flex flex-col items-center">
               <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-2 border-muted">
                 <img
-                  src={profilePicture || "https://via.placeholder.com/150"}
-                  alt={name || "Profile Picture"}
+                  src={profilePicture}
+                  alt={name}
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h2 className="text-xl font-semibold text-foreground">
-                {name || "Name not provided"}
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                {email || "Email not provided"}
-              </p>
-              <p className="text-sm text-muted-foreground mt-2">
-                {bio || "No bio available"}
-              </p>
+              <h2 className="text-xl font-semibold text-foreground">{name}</h2>
+              <p className="text-sm text-muted-foreground">{email}</p>
+              <p className="text-sm text-muted-foreground mt-2">{bio}</p>
             </CardHeader>
             <CardContent>
               <div className="flex justify-center space-x-4 mb-4">
-                {socialMedia?.twitter && (
+                {socialMedia.twitter && (
                   <a
                     href={socialMedia.twitter}
                     target="_blank"
@@ -125,7 +143,7 @@ const Profile = () => {
                     <FaTwitter className="w-6 h-6" />
                   </a>
                 )}
-                {socialMedia?.linkedin && (
+                {socialMedia.linkedin && (
                   <a
                     href={socialMedia.linkedin}
                     target="_blank"
@@ -135,7 +153,7 @@ const Profile = () => {
                     <FaLinkedin className="w-6 h-6" />
                   </a>
                 )}
-                {socialMedia?.github && (
+                {socialMedia.github && (
                   <a
                     href={socialMedia.github}
                     target="_blank"
@@ -145,7 +163,7 @@ const Profile = () => {
                     <FaGithub className="w-6 h-6" />
                   </a>
                 )}
-                {socialMedia?.instagram && (
+                {socialMedia.instagram && (
                   <a
                     href={socialMedia.instagram}
                     target="_blank"
@@ -157,27 +175,31 @@ const Profile = () => {
                 )}
               </div>
               <p className="text-sm text-muted-foreground mb-4">
-                Member since {createdAt ? formattedDate : "Unknown date"}
+                Member since {formattedDate}
               </p>
-              <div className="flex justify-center space-x-4 mb-4">
-                <Link to="/edit-profile">
-                  <Button variant="default">Edit Profile</Button>
-                </Link>
-                <Button
-                  onClick={() => setShowDeleteModal(true)}
-                  variant="destructive"
-                >
-                  Delete Profile
-                </Button>
-              </div>
-              <div className="flex justify-center">
-                <Button
-                  onClick={() => setShowChangePasswordModal(true)}
-                  variant="outline"
-                >
-                  Change Password
-                </Button>
-              </div>
+              {isOwner && (
+                <div className="flex justify-center space-x-4 mb-4">
+                  <Link to="/edit-profile">
+                    <Button variant="default">Edit Profile</Button>
+                  </Link>
+                  <Button
+                    onClick={() => setShowDeleteModal(true)}
+                    variant="destructive"
+                  >
+                    Delete Profile
+                  </Button>
+                </div>
+              )}
+              {isOwner && (
+                <div className="flex justify-center">
+                  <Button
+                    onClick={() => setShowChangePasswordModal(true)}
+                    variant="outline"
+                  >
+                    Change Password
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -202,7 +224,6 @@ const Profile = () => {
                   <Button
                     onClick={() => setShowDeleteModal(false)}
                     variant="default"
-                    
                   >
                     Cancel
                   </Button>
