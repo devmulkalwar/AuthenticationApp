@@ -1,21 +1,36 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import emailjs from "emailjs-com"; // Import EmailJS SDK
+import { useGlobalContext } from "@/hooks/useGlobalContext";
+import { Navigate } from "react-router-dom";
 
 const Contact = () => {
-  
+  const { user, handleToast } = useGlobalContext(); // Access user data from context
   const form = useRef(); // Create form ref
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(""); // Initialize email state
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState("");
+  const[currentUser, setCurrentUser] = useState(null);
+  useEffect(() => {
+    if (user) {
+      setCurrentUser(user);
+      setEmail(user.email);
+    }
+  }, [user]);
 
+  
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -38,22 +53,25 @@ const Contact = () => {
         (response) => {
           // Success message handling
           console.log("Email sent successfully", response);
-          setSubmissionStatus("Your message has been sent successfully!");
-          setIsLoading(false); // Reset loading state
-          setName("");
-          setEmail("");
-          setSubject("");
+          handleToast("Your message has been sent successfully!", "success");
           setMessage("");
+          setSubject("");
+          setIsLoading(false); // Reset loading state
         },
         (error) => {
           // Error message handling
           console.error("Error sending email", error);
-          setSubmissionStatus(error?.text || "Error sending message. Please try again.");
+          handleToast(
+            error?.text || "Error sending message. Please try again."
+          );
           setIsLoading(false); // Reset loading state
         }
       );
   };
 
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
   return (
     <div className="flex flex-grow w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-2xl">
@@ -68,27 +86,28 @@ const Contact = () => {
             <form ref={form} onSubmit={handleSubmit} className="space-y-6">
               {/* Name */}
               <Input
-                name="from_name"  // Corrected name for EmailJS template
+                name="from_name" // Corrected name for EmailJS template
                 type="text"
                 placeholder="Your Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={user ? user.fullName : ""}
+                readOnly={true} // Set to read-only
                 required
               />
 
               {/* Email */}
               <Input
-                name="from_email"  // Corrected name for EmailJS template
+                name="from_email" // Corrected name for EmailJS template
                 type="email"
                 placeholder="Your Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                readOnly={true} // Set to read-only
                 required
               />
 
               {/* Subject */}
               <Input
-                name="subject"  // Corrected name for EmailJS template
+                name="subject" 
                 type="text"
                 placeholder="Subject"
                 value={subject}
@@ -98,7 +117,7 @@ const Contact = () => {
 
               {/* Message */}
               <Textarea
-                name="message"  // Corrected name for EmailJS template
+                name="message" 
                 placeholder="Your Message"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -111,19 +130,6 @@ const Contact = () => {
                 {isLoading ? "Sending..." : "Send Message"}
               </Button>
             </form>
-
-            {/* Submission Status Message */}
-            {submissionStatus && (
-              <p
-                className={`mt-4 text-center ${
-                  submissionStatus.includes("successfully")
-                    ? "text-green-600"
-                    : "text-red-600"
-                }`}
-              >
-                {submissionStatus}
-              </p>
-            )}
           </CardContent>
         </Card>
       </div>

@@ -3,17 +3,28 @@ import ProfileCard from "@/components/ProfileCard";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { FaSearch } from "react-icons/fa";
+import { Navigate } from "react-router-dom";
 
 const Home = () => {
-  const { users, getAllUsers } = useGlobalContext();
+  const { users, getAllUsers, user } = useGlobalContext();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [usersArray, setUsersArray] = useState([]);
-
+  const [currentUser, setCurrentUser] = useState(null);
+  useEffect(() => {
+    if (user) {
+      setCurrentUser(user);
+    }
+  }, [user]);
   useEffect(() => {
     if (users) {
       setUsersArray(users);
@@ -59,12 +70,18 @@ const Home = () => {
     );
   }
 
+  
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
   return (
     <div className="flex flex-col w-full items-center justify-center p-4 md:p-6 lg:p-8 min-h-screen">
       {/* Page Heading */}
       <div className="text-center mb-6 md:mb-8">
         <h1 className="text-2xl md:text-3xl font-bold mb-2">User Profiles</h1>
-        <p className="text-sm md:text-base">Browse and discover user profiles.</p>
+        <p className="text-sm md:text-base">
+          Browse and discover user profiles.
+        </p>
       </div>
 
       {/* Search and Sort Section */}
@@ -83,7 +100,10 @@ const Home = () => {
 
         {/* Sort Dropdown */}
         <div className="relative w-full md:w-auto">
-          <Select value={sortOrder} onValueChange={(value) => setSortOrder(value)}>
+          <Select
+            value={sortOrder}
+            onValueChange={(value) => setSortOrder(value)}
+          >
             <SelectTrigger className="w-full md:w-[200px]">
               {sortOrder === "newest" ? "Newest Profiles" : "Oldest Profiles"}
             </SelectTrigger>

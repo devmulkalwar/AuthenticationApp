@@ -10,15 +10,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
-import { useRef } from "react"; // Import useRef to access form data
+import { useRef, useState } from "react"; // Import useState
 import { useGlobalContext } from "@/hooks/useGlobalContext";
-export function RegisterForm({ className, ...props }) {
-  const {register} = useGlobalContext();
-  const formRef = useRef(null);
 
-  // Handle form submission
-  const handleSubmit = (event) => {
+export function RegisterForm({ className, ...props }) {
+  const { register } = useGlobalContext();
+  const formRef = useRef(null);
+  const [loading, setLoading] = useState(false); // Add loading state
+
+  const handleSubmit = async (event) => {
     event.preventDefault(); // Prevent default form submission
+
+    // Set loading to true
+    setLoading(true);
 
     // Access form data
     const formData = new FormData(formRef.current);
@@ -29,14 +33,25 @@ export function RegisterForm({ className, ...props }) {
       data[key] = value;
     });
 
-    // Log the form data to the console
-    console.log("Form Data:", data);
-    if(data.password !== data.confirmPassword){
-      return alert("Passwords do not match");
-    } else {
-      register(data);
+    // Check if passwords match
+    if (data.password !== data.confirmPassword) {
+      alert("Passwords do not match");
+      setLoading(false); // Reset loading state
+      return;
     }
-   
+
+    try {
+      // Simulate a delay (replace this with your actual registration API call)
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Call the register function with the form data
+      await register(data);
+    } catch (error) {
+      console.error("Registration failed:", error);
+    } finally {
+      // Reset loading state
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,14 +64,13 @@ export function RegisterForm({ className, ...props }) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Attach the ref and onSubmit handler to the form */}
           <form ref={formRef} onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
-                  name="email" // Add a name attribute to identify the field
+                  name="email"
                   type="email"
                   placeholder="m@example.com"
                   required
@@ -68,7 +82,7 @@ export function RegisterForm({ className, ...props }) {
                 </div>
                 <Input
                   id="password"
-                  name="password" 
+                  name="password"
                   type="password"
                   required
                 />
@@ -79,13 +93,39 @@ export function RegisterForm({ className, ...props }) {
                 </div>
                 <Input
                   id="confirm-password"
-                  name="confirmPassword" // Add a name attribute to identify the field
+                  name="confirmPassword"
                   type="password"
                   required
                 />
               </div>
-              <Button type="submit" className="w-full">
-                Register
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <svg
+                      className="animate-spin h-5 w-5 mr-3 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Registering...
+                  </div>
+                ) : (
+                  "Register"
+                )}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">

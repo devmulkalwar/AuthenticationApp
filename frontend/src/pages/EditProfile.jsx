@@ -16,9 +16,15 @@ const EditProfile = () => {
   const [twitter, setTwitter] = useState("");
   const [github, setGithub] = useState("");
   const [linkedin, setLinkedin] = useState("");
-
+  const[currentUser, setCurrentUser] = useState(null);
   // Track the initial values for comparison
   const [initialValues, setInitialValues] = useState({});
+
+  useEffect(() => {
+    if (user) {
+      setCurrentUser(user);
+    }
+  }, [user]);
 
   // Function to compare current state with initial values
   const hasChanges = () => {
@@ -100,6 +106,11 @@ const EditProfile = () => {
     }
   }, [user]);
 
+  
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+  
   return (
     <div className="flex flex-grow w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-2xl">

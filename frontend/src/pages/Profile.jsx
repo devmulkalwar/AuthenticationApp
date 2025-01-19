@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FaTwitter, FaLinkedin, FaGithub, FaInstagram, FaShare } from "react-icons/fa";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const Profile = () => {
@@ -57,6 +57,9 @@ const Profile = () => {
     };
   }, [showDeleteModal, showChangePasswordModal]);
 
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
   // Display a message if no user data is found
   if (!owner) {
     return (
@@ -65,6 +68,7 @@ const Profile = () => {
       </p>
     );
   }
+  
 
   const {
     fullName: name = "Name not provided",

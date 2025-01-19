@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns"; // For date formatting
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
+import defaultProfile from  "../assets/defaultAvtar.png";
 
 const ProfileCard = ({
   profilePicture,
@@ -33,7 +34,7 @@ const ProfileCard = ({
         {/* Profile Picture */}
         <div className="w-20 h-20 mb-4 rounded-full overflow-hidden">
           <img
-            src={profilePicture || "https://via.placeholder.com/150"}
+            src={profilePicture || defaultProfile}
             alt={name || "Profile Picture"}
             className="w-full h-full object-cover"
           />

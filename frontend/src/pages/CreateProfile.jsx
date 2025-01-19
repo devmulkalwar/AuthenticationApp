@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,8 +10,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
+import { Navigate } from "react-router-dom";
 
-const CreateProfile = () => {
+  const CreateProfile = () => {
   const { createProfile, user } = useGlobalContext();
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
@@ -21,6 +22,13 @@ const CreateProfile = () => {
   const [github, setGithub] = useState("");
   const [linkedin, setLinkedin] = useState("");
   const [message, setMessage] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
+  useEffect(() => {
+    if (user) {
+      setCurrentUser(user);
+      
+    }
+  }, [user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,6 +69,11 @@ const CreateProfile = () => {
       console.log("No file selected");
     }
   };
+
+  
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <div className="flex flex-grow w-full items-center justify-center p-6 md:p-10">

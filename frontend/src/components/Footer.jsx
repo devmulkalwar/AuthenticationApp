@@ -10,7 +10,7 @@ const Footer = () => {
         <div className="flex justify-center space-x-6">
           {/* Twitter */}
           <a
-            href="https://twitter.com"
+            href="https://x.com/dev_mulkalwar"
             target="_blank"
             rel="noopener noreferrer"
             className="text-muted-foreground hover:text-primary transition-colors"
@@ -20,7 +20,7 @@ const Footer = () => {
 
           {/* GitHub */}
           <a
-            href="https://github.com"
+            href="https://github.com/devmulkalwar"
             target="_blank"
             rel="noopener noreferrer"
             className="text-muted-foreground hover:text-primary transition-colors"
@@ -30,7 +30,7 @@ const Footer = () => {
 
           {/* LinkedIn */}
           <a
-            href="https://linkedin.com"
+            href="https://www.linkedin.com/in/dev-mulkalwar-b2745a258/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-muted-foreground hover:text-primary transition-colors"
@@ -40,7 +40,7 @@ const Footer = () => {
 
           {/* Instagram */}
           <a
-            href="https://instagram.com"
+            href="https://www.instagram.com/dev_mulkalwar/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-muted-foreground hover:text-primary transition-colors"

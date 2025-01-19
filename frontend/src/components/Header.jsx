@@ -12,6 +12,7 @@ import {
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
+import defaultProfile from  "../assets/defaultAvtar.png";
 
 const Header = () => {
   const { isAuthenticated, logout, user } = useGlobalContext(); // Replace with your authentication logic
@@ -145,7 +146,7 @@ const Header = () => {
 
             {/* Profile Avatar (Rightmost side) */}
             <ProfileAvatar
-              src={currentUser?.profilePicture || "https://via.placeholder.com/150"} // Use optional chaining for safety
+              src={currentUser?.profilePicture || defaultProfile} // Use optional chaining for safety
               alt="Profile"
             />
           </NavbarMenu>
