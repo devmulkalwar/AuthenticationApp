@@ -1,5 +1,13 @@
 import mongoose from "mongoose";
 
+// Regular expression for validating social media URLs
+const socialMediaUrlRegex = {
+  instagram: /^https:\/\/(www\.)?instagram\.com(\/.*)?$/,
+  linkedin: /^https:\/\/(www\.)?linkedin\.com(\/.*)?$/,
+  github: /^https:\/\/(www\.)?github\.com(\/.*)?$/,
+  x: /^https:\/\/(www\.)?x\.com(\/.*)?$/,
+};
+
 const userSchema = new mongoose.Schema(
   {
     fullName: {
@@ -10,7 +18,7 @@ const userSchema = new mongoose.Schema(
       unique: true, 
       required: true, 
     },
-    bio :{
+    bio: {
       type: String,
     },
     password: {
@@ -22,21 +30,29 @@ const userSchema = new mongoose.Schema(
       default: "https://via.placeholder.com/150", 
     },
     socialMedia: {
-      twitter: {
+      instagram: {
         type: String,
         trim: true, 
+        match: [socialMediaUrlRegex.instagram, 'Please enter a valid Instagram URL'],
+        default: 'https://instagram.com/',
       },
       linkedin: {
         type: String,
         trim: true,
+        match: [socialMediaUrlRegex.linkedin, 'Please enter a valid LinkedIn URL'],
+        default: 'https://linkedin.com/',
       },
       github: {
         type: String,
         trim: true,
+        match: [socialMediaUrlRegex.github, 'Please enter a valid GitHub URL'],
+        default: 'https://github.com/',
       },
-      instagram: {
+      twitter : {
         type: String,
         trim: true,
+        match: [socialMediaUrlRegex.x, 'Please enter a valid X.com (formerly Twitter) URL'],
+        default: 'https://x.com/',
       },
     },
     lastLogin: {
@@ -47,8 +63,8 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false, 
     },
-    isProfileComplete:{
-      type:Boolean,
+    isProfileComplete: {
+      type: Boolean,
       default: false, 
     },
     resetPasswordToken: String, 
@@ -56,7 +72,7 @@ const userSchema = new mongoose.Schema(
     verificationToken: String,
     verificationTokenExpiresAt: Date, 
   },
-  { timestamps: true } 
+  { timestamps: true }
 );
 
 // Create the User model

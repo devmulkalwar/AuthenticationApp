@@ -70,12 +70,10 @@ export const register = async (req, res) => {
     });
   } catch (error) {
     console.error("Error during signup:", error);
-    res
-      .status(400)
-      .json({
-        success: false,
-        message: error.message || "Error during signup",
-      });
+    res.status(400).json({
+      success: false,
+      message: error.message || "Error during signup",
+    });
   }
 };
 
@@ -351,12 +349,10 @@ export const createProfile = async (req, res) => {
     console.error("Error in createProfile:", error);
 
     // Handle error response
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: error.message || "Error creating profile",
-      });
+    res.status(500).json({
+      success: false,
+      message: error.message || "Error creating profile",
+    });
   } finally {
     // Delete local file if it exists
     if (path && fs.existsSync(path)) {
