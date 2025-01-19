@@ -14,7 +14,7 @@ import { useRef, useState } from "react"; // Import useState
 import { useGlobalContext } from "@/hooks/useGlobalContext";
 
 export function RegisterForm({ className, ...props }) {
-  const { register } = useGlobalContext();
+  const { register,handleToast } = useGlobalContext();
   const formRef = useRef(null);
   const [loading, setLoading] = useState(false); // Add loading state
 
@@ -35,7 +35,7 @@ export function RegisterForm({ className, ...props }) {
 
     // Check if passwords match
     if (data.password !== data.confirmPassword) {
-      alert("Passwords do not match");
+      handleToast("Passwords do not match", "error");
       setLoading(false); // Reset loading state
       return;
     }

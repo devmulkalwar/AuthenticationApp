@@ -1,21 +1,21 @@
 import * as React from "react";
 import { cn } from "@/lib/utils"; // Assuming you have the cn utility to merge classes
-import { Twitter, Github, Linkedin, Instagram } from "lucide-react"; // Import Lucide icons
+import { FaTwitter, FaGithub, FaLinkedin, FaInstagram } from "react-icons/fa"; // Importing React Icons
 
 const Footer = () => {
   return (
-    <footer className="bg-card text-card-foreground border-t">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <footer className="bg-card text-card-foreground border-t py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Social Media Icons */}
-        <div className="flex justify-center space-x-6">
+        <div className="flex justify-center space-x-8">
           {/* Twitter */}
           <a
             href="https://x.com/dev_mulkalwar"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-primary transition-colors"
+            className="text-muted-foreground hover:text-primary transform hover:scale-110 transition-all"
           >
-            <Twitter className="h-6 w-6" />
+            <FaTwitter className="h-8 w-8" />
           </a>
 
           {/* GitHub */}
@@ -23,9 +23,9 @@ const Footer = () => {
             href="https://github.com/devmulkalwar"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-primary transition-colors"
+            className="text-muted-foreground hover:text-primary transform hover:scale-110 transition-all"
           >
-            <Github className="h-6 w-6" />
+            <FaGithub className="h-8 w-8" />
           </a>
 
           {/* LinkedIn */}
@@ -33,9 +33,9 @@ const Footer = () => {
             href="https://www.linkedin.com/in/dev-mulkalwar-b2745a258/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-primary transition-colors"
+            className="text-muted-foreground hover:text-primary transform hover:scale-110 transition-all"
           >
-            <Linkedin className="h-6 w-6" />
+            <FaLinkedin className="h-8 w-8" />
           </a>
 
           {/* Instagram */}
@@ -43,15 +43,18 @@ const Footer = () => {
             href="https://www.instagram.com/dev_mulkalwar/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-primary transition-colors"
+            className="text-muted-foreground hover:text-primary transform hover:scale-110 transition-all"
           >
-            <Instagram className="h-6 w-6" />
+            <FaInstagram className="h-8 w-8" />
           </a>
         </div>
 
         {/* Made with Love and Copyright */}
-        <div className="mt-4 text-center text-sm text-muted-foreground">
-          Made with ❤️ &copy; {new Date().getFullYear()} Your Company. All rights reserved.
+        <div className="mt-6 text-center text-sm text-muted-foreground opacity-80">
+          <p>Made with ❤️ &copy; {new Date().getFullYear()} LinkWeb. All rights reserved.</p>
+          <p className="opacity-70">
+            Designed and developed with care.
+          </p>
         </div>
       </div>
     </footer>

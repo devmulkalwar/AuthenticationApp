@@ -9,7 +9,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaSpinner } from "react-icons/fa";
 import { Navigate } from "react-router-dom";
 
 const Home = () => {
@@ -59,7 +59,10 @@ const Home = () => {
   if (!users) {
     return (
       <div className="flex flex-grow w-full items-center justify-center p-4 md:p-6">
-        <p>Loading users...</p>
+        <div className="flex items-center space-x-2">
+          <FaSpinner className="animate-spin h-6 w-6 text-muted-foreground" />
+          <p>Loading users...</p>
+        </div>
       </div>
     );
   }

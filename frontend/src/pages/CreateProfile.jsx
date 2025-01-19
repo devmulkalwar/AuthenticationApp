@@ -10,76 +10,65 @@ import {
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
-import { Navigate } from "react-router-dom";
-
-  const CreateProfile = () => {
-  const { createProfile, user,isAuthenticated } = useGlobalContext();
+import { FaSpinner } from "react-icons/fa"; // Spinner icon from react-icons
+import defaultProfile from "../assets/defaultAvtar.png";
+const CreateProfile = () => {
+  const { createProfile, user, isAuthenticated, handleToast } =
+    useGlobalContext();
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
-  const [profilePicture, setProfilePicture] = useState(null); // Use null initially
-  const [instagram, setInstagram] = useState("");
-  const [twitter, setTwitter] = useState("");
-  const [github, setGithub] = useState("");
-  const [linkedin, setLinkedin] = useState("");
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [instagram, setInstagram] = useState(""); // Empty initial value
+  const [twitter, setTwitter] = useState(""); // Empty initial value
+  const [github, setGithub] = useState(""); // Empty initial value
+  const [linkedin, setLinkedin] = useState(""); // Empty initial value
   const [message, setMessage] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Track submitting state
+
   useEffect(() => {
     if (user) {
       setCurrentUser(user);
-      
     }
   }, [user]);
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Create FormData object
+    setIsSubmitting(true); // Set submitting state to true
+
     const formData = new FormData();
     formData.append("userId", user._id);
     formData.append("fullName", name);
     formData.append("bio", bio);
-
     formData.append("socialMedia[github]", github);
     formData.append("socialMedia[instagram]", instagram);
     formData.append("socialMedia[linkedin]", linkedin);
     formData.append("socialMedia[twitter]", twitter);
 
-    // Append the profile picture to formData if available
     if (profilePicture) {
       formData.append("profilePicture", profilePicture);
     }
 
     try {
       await createProfile(formData);
-      setMessage("Profile created successfully!");
+       // Display success toast
     } catch (error) {
-      setMessage("Error occurred while creating profile.");
+      console.log(error) // Display error toast
+    } finally {
+      setIsSubmitting(false); // Reset submitting state
     }
   };
 
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfilePicture(file); // Store the file itself
-      };
-      reader.readAsDataURL(file); // Read the file as a data URL
-    } else {
-      console.log("No file selected");
+      setProfilePicture(file); // Store the file itself
     }
   };
-
-  
-  if (!currentUser) {
-    return <Navigate to="/login" replace />;
-  }
 
   return (
     <div className="flex flex-grow w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-2xl">
-        {/* Edit Profile Section */}
         <Card className={cn("flex flex-col gap-6")}>
           <CardHeader>
             <CardTitle className="text-center">Edit Profile</CardTitle>
@@ -96,7 +85,7 @@ import { Navigate } from "react-router-dom";
                     src={
                       profilePicture
                         ? URL.createObjectURL(profilePicture)
-                        : "https://via.placeholder.com/150"
+                        : defaultProfile
                     }
                     alt="Profile Picture"
                     className="w-full h-full object-cover"
@@ -118,68 +107,112 @@ import { Navigate } from "react-router-dom";
               </div>
 
               {/* Name */}
-              <Input
-                type="text"
-                placeholder="Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-
-              {/* Bio */}
-              <Input
-                type="text"
-                placeholder="Bio"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-              />
-
-              {/* Social Media Links */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium mb-1"
+                >
+                  Name
+                </label>
                 <Input
+                  id="name"
                   type="text"
-                  placeholder="Instagram URL"
-                  value={instagram}
-                  onChange={(e) => setInstagram(e.target.value)}
-                />
-                <Input
-                  type="text"
-                  placeholder="Twitter URL"
-                  value={twitter}
-                  onChange={(e) => setTwitter(e.target.value)}
-                />
-                <Input
-                  type="text"
-                  placeholder="GitHub URL"
-                  value={github}
-                  onChange={(e) => setGithub(e.target.value)}
-                />
-                <Input
-                  type="text"
-                  placeholder="LinkedIn URL"
-                  value={linkedin}
-                  onChange={(e) => setLinkedin(e.target.value)}
+                  placeholder="Enter your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
                 />
               </div>
 
+              {/* Bio */}
+              <div>
+                <label htmlFor="bio" className="block text-sm font-medium mb-1">
+                  Bio
+                </label>
+                <Input
+                  id="bio"
+                  type="text"
+                  placeholder="Enter your bio"
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    htmlFor="instagram"
+                    className="block text-sm font-medium mb-1"
+                  >
+                    Instagram
+                  </label>
+                  <Input
+                    id="instagram"
+                    type="text"
+                    placeholder="https://www.instagram.com/yourusername/"
+                    value={instagram}
+                    onChange={(e) => setInstagram(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="twitter"
+                    className="block text-sm font-medium mb-1"
+                  >
+                    Twitter
+                  </label>
+                  <Input
+                    id="twitter"
+                    type="text"
+                    placeholder="https://x.com/yourusername"
+                    value={twitter}
+                    onChange={(e) => setTwitter(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="github"
+                    className="block text-sm font-medium mb-1"
+                  >
+                    GitHub
+                  </label>
+                  <Input
+                    id="github"
+                    type="text"
+                    placeholder="https://github.com/yourusername"
+                    value={github}
+                    onChange={(e) => setGithub(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="linkedin"
+                    className="block text-sm font-medium mb-1"
+                  >
+                    LinkedIn
+                  </label>
+                  <Input
+                    id="linkedin"
+                    type="text"
+                    placeholder="https://www.linkedin.com/in/yourusername/"
+                    value={linkedin}
+                    onChange={(e) => setLinkedin(e.target.value)}
+                  />
+                </div>
+              </div>
+
               {/* Submit Button */}
-              <Button type="submit" className="w-full">
-                Create Profile
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isSubmitting} // Disable button while submitting
+              >
+                {isSubmitting ? (
+                  <FaSpinner className="animate-spin h-5 w-5 text-white" />
+                ) : (
+                  "Create Profile"
+                )}
               </Button>
             </form>
-
-            {/* Success/Error Message */}
-            {message && (
-              <p
-                className={`mt-4 text-center ${
-                  message.includes("successfully")
-                    ? "text-green-600"
-                    : "text-red-600"
-                }`}
-              >
-                {message}
-              </p>
-            )}
           </CardContent>
         </Card>
       </div>

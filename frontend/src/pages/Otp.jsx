@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   InputOTP,
   InputOTPGroup,
@@ -11,37 +11,16 @@ import { cn } from "@/lib/utils"; // Ensure you have this utility for className 
 import { useGlobalContext } from "@/hooks/useGlobalContext";
 
 export default function Otp() {
-  const{verifyEmail} = useGlobalContext();
+  const { verifyEmail,handleToast } = useGlobalContext();
   const [otp, setOtp] = useState("");
   const [message, setMessage] = useState("");
-  const [timer, setTimer] = useState(30); // 30-second timer
-  const [isResendDisabled, setIsResendDisabled] = useState(true);
-
-  // Timer logic
-  useEffect(() => {
-    if (timer > 0) {
-      const interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
-      return () => clearInterval(interval);
-    } else {
-      setIsResendDisabled(false); // Enable resend button when timer reaches 0
-    }
-  }, [timer]);
 
   const handleVerify = () => {
-   if(otp===""){
-      setMessage("Please enter OTP");
-   }else{
+    if (otp === "") {
+      handleToast("Please enter the OTP", "error");
+    } else {
       verifyEmail(otp);
-   }
-  };
-
-  const handleResendOtp = () => {
-    // Logic to resend OTP (e.g., API call)
-    setTimer(30); // Reset timer
-    setIsResendDisabled(true); // Disable resend button again
-    setMessage("OTP has been resent. Check your inbox.");
+    }
   };
 
   return (
@@ -54,7 +33,7 @@ export default function Otp() {
               Enter the 6-digit OTP sent to your email/phone.
             </CardDescription>
           </CardHeader>
-          <div className=" flex flex-col items-center justify-center gap-4 p-6 pt-0">
+          <div className="flex flex-col items-center justify-center gap-4 p-6 pt-0">
             <InputOTP
               maxLength={6}
               value={otp}
@@ -72,38 +51,9 @@ export default function Otp() {
                 <InputOTPSlot index={5} />
               </InputOTPGroup>
             </InputOTP>
-            <Button
-              
-              className="w-2/3 mt-4"
-              onClick={handleVerify}
-            >
+            <Button className="w-2/3 mt-4" onClick={handleVerify}>
               Verify
-            </Button>
-            {message && (
-              <p
-                className={`mt-4 text-center ${
-                  message.includes("successfully") ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                {message}
-              </p>
-            )}
-            <div className="mt-4 text-center">
-              {isResendDisabled ? (
-                <p className="text-sm text-gray-600">
-                  Resend OTP in {timer} seconds
-                </p>
-              ) : (
-                <Button
-                  variant="link"
-                  className="text-sm text-blue-600"
-                  onClick={handleResendOtp}
-                  disabled={isResendDisabled}
-                >
-                  Resend OTP
-                </Button>
-              )}
-            </div>
+            </Button> 
           </div>
         </Card>
       </div>

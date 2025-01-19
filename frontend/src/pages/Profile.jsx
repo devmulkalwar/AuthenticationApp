@@ -10,7 +10,7 @@ import {
   FaShare,
 } from "react-icons/fa";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const Profile = () => {
@@ -21,7 +21,6 @@ const Profile = () => {
     handleToast,
     setErrorMessage,
     users,
-    isAuthenticated,
   } = useGlobalContext();
   const { id } = useParams(); // Get user ID from URL params
   const [currentUser, setCurrentUser] = useState(null);
@@ -41,7 +40,6 @@ const Profile = () => {
     }
   }, [user]);
 
- 
   // Effect to set the users array
   useEffect(() => {
     if (users) {
@@ -52,14 +50,9 @@ const Profile = () => {
   // Effect to find the profile for the viewed user by URL parameter
   useEffect(() => {
     if (id) {
-      console.log("Current User:", currentUser); // Debugging
-      console.log("Users Array:", usersArray); // Debugging
-
       // Combine currentUser and usersArray for searching
       const allUsers = currentUser ? [currentUser, ...usersArray] : usersArray;
-
       const foundUser = allUsers.find((u) => u._id === id); // Search for user in combined array
-      console.log("Found User:", foundUser); // Debugging
       setOwner(foundUser || null); // Set the user's data or null if not found
     }
   }, [id, usersArray, currentUser]);
@@ -104,13 +97,11 @@ const Profile = () => {
   const handleDeleteProfile = async () => {
     try {
       await deleteProfile(password, owner._id);
-      alert("Profile deleted successfully.");
+      handleToast("Profile deleted successfully.", "success");
       setShowDeleteModal(false);
     } catch (error) {
       console.error("Error deleting profile:", error);
-      alert(
-        "Failed to delete profile. Please ensure your password is correct."
-      );
+      handleToast("Failed to delete profile. Please ensure your password is correct.", "error");
     }
   };
 
@@ -123,11 +114,11 @@ const Profile = () => {
 
     try {
       await changePassword(owner._id, oldPassword, newPassword);
-      alert("Password changed successfully.");
+      handleToast("Password changed successfully.", "success");
       setShowChangePasswordModal(false);
     } catch (error) {
       console.error("Error changing password:", error);
-      alert("Failed to change password. Please check your old password.");
+      handleToast("Failed to change password. Please check your old password.", "error");
     }
   };
 
@@ -142,7 +133,7 @@ const Profile = () => {
       });
     } catch (error) {
       console.error("Error sharing profile:", error);
-      alert("Sharing is not supported on this device.");
+      handleToast("Sharing is not supported on this device.", "error");
     }
   };
 
@@ -239,7 +230,6 @@ const Profile = () => {
               <div className="flex justify-center mt-4">
                 <Button
                   onClick={handleShareProfile}
-                  variant="outline"
                   className="flex items-center gap-2"
                 >
                   <FaShare className="w-4 h-4" />

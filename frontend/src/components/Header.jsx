@@ -12,7 +12,7 @@ import {
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
-import defaultProfile from  "../assets/defaultAvtar.png";
+import defaultProfile from "../assets/defaultAvtar.png";
 
 const Header = () => {
   const { isAuthenticated, logout, user } = useGlobalContext(); // Replace with your authentication logic
@@ -32,7 +32,7 @@ const Header = () => {
       setCurrentUser(user);
     }
   }, [user]);
- 
+
   useEffect(() => {
     if (isDarkMode) {
       document.body.classList.add("dark");
@@ -49,43 +49,45 @@ const Header = () => {
     <Navbar>
       <NavbarHeader>
         <div className="flex justify-between h-16 items-center">
-          {/* Mobile Menu Toggle Button (Left side on small devices) */}
-          <NavbarToggle className="md:hidden order-1">
-            <button onClick={toggleMenu}>
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                {isOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 12h16m-7 6h7"
-                  />
-                )}
-              </svg>
-            </button>
-          </NavbarToggle>
+          <div className="flex items-center space-x-4">
+            {/* Mobile Menu Toggle Button (Left side on small devices) */}
+            <NavbarToggle className="md:hidden order-1">
+              <button onClick={toggleMenu}>
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  {isOpen ? (
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  ) : (
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M4 6h16M4 12h16m-7 6h7"
+                    />
+                  )}
+                </svg>
+              </button>
+            </NavbarToggle>
 
-          {/* Logo (Center on small devices, left on larger devices) */}
-          <div className="flex items-center order-2 md:order-1">
-            <Link
-              to="/"
-              className="text-xl font-bold text-card-foreground dark:text-white"
-            >
-              AuthApp
-            </Link>
+            {/* Logo (Center on small devices, left on larger devices) */}
+            <div className="flex items-center order-2 md:order-1">
+              <Link
+                to="/"
+                className="text-xl font-bold text-card-foreground dark:text-white"
+              >
+                LinkWeb
+              </Link>
+            </div>
           </div>
 
           {/* Desktop Menu */}
@@ -204,7 +206,10 @@ const Header = () => {
             <NavbarLink to="/" className="block">
               Home
             </NavbarLink>
-            <NavbarLink to={`/profile/${currentUser?._id || ""}`} className="block">
+            <NavbarLink
+              to={`/profile/${currentUser?._id || ""}`}
+              className="block"
+            >
               Profile
             </NavbarLink>
             <NavbarLink to="/contact" className="block">

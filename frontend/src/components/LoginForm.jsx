@@ -13,7 +13,6 @@ import { Link } from "react-router-dom";
 import { useRef, useState } from "react"; // Import useState
 import { useGlobalContext } from "@/hooks/useGlobalContext";
 
-
 export function LoginForm({ className, ...props }) {
   const { login } = useGlobalContext();
   const formRef = useRef(null);
@@ -34,18 +33,8 @@ export function LoginForm({ className, ...props }) {
       data[key] = value;
     });
 
-    try {
-      // Simulate a delay (replace this with your actual login API call)
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Call the login function with the form data
-      await login(data);
-    } catch (error) {
-      console.error("Login failed:", error);
-    } finally {
-      // Reset loading state
-      setLoading(false);
-    }
+    // Call the login function with the form data
+    await login(data);
   };
 
   return (
