@@ -1,52 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import emailjs from "emailjs-com"; // Import EmailJS SDK
 
 const Contact = () => {
-  // State for form fields
+  
+  const form = useRef(); // Create form ref
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState("");
 
   // Handle form submission
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validate form fields
-    if (!name || !email || !subject || !message) {
-      setSubmissionStatus("Please fill out all fields.");
-      return;
-    }
+    // Set loading state to true
+    setIsLoading(true);
 
-    // Simulate form submission (replace with actual API call)
-    try {
-      // Replace this with your actual API endpoint
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    // Initialize EmailJS with private key
+    emailjs.init(import.meta.env.VITE_EMAIL_PRIVATE_KEY);
+
+    // Send the form data using EmailJS
+    emailjs
+      .sendForm(
+        import.meta.env.VITE_EMAIL_SERVICE_ID,
+        import.meta.env.VITE_EMAIL_TEMPLATE_ID,
+        form.current,
+        import.meta.env.VITE_EMAIL_PUBLIC_KEY
+      )
+      .then(
+        (response) => {
+          // Success message handling
+          console.log("Email sent successfully", response);
+          setSubmissionStatus("Your message has been sent successfully!");
+          setIsLoading(false); // Reset loading state
+          setName("");
+          setEmail("");
+          setSubject("");
+          setMessage("");
         },
-        body: JSON.stringify({ name, email, subject, message }),
-      });
-
-      if (response.ok) {
-        setSubmissionStatus("Message sent successfully!");
-        setName("");
-        setEmail("");
-        setSubject("");
-        setMessage("");
-      } else {
-        setSubmissionStatus("Failed to send message. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      setSubmissionStatus("An error occurred. Please try again later.");
-    }
+        (error) => {
+          // Error message handling
+          console.error("Error sending email", error);
+          setSubmissionStatus(error?.text || "Error sending message. Please try again.");
+          setIsLoading(false); // Reset loading state
+        }
+      );
   };
 
   return (
@@ -60,9 +65,10 @@ const Contact = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form ref={form} onSubmit={handleSubmit} className="space-y-6">
               {/* Name */}
               <Input
+                name="from_name"  // Corrected name for EmailJS template
                 type="text"
                 placeholder="Your Name"
                 value={name}
@@ -72,6 +78,7 @@ const Contact = () => {
 
               {/* Email */}
               <Input
+                name="from_email"  // Corrected name for EmailJS template
                 type="email"
                 placeholder="Your Email"
                 value={email}
@@ -81,6 +88,7 @@ const Contact = () => {
 
               {/* Subject */}
               <Input
+                name="subject"  // Corrected name for EmailJS template
                 type="text"
                 placeholder="Subject"
                 value={subject}
@@ -90,6 +98,7 @@ const Contact = () => {
 
               {/* Message */}
               <Textarea
+                name="message"  // Corrected name for EmailJS template
                 placeholder="Your Message"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -98,8 +107,8 @@ const Contact = () => {
               />
 
               {/* Submit Button */}
-              <Button type="submit" className="w-full">
-                Send Message
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Sending..." : "Send Message"}
               </Button>
             </form>
 

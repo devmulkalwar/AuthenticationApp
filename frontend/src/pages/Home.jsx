@@ -4,7 +4,7 @@ import { useGlobalContext } from "@/hooks/useGlobalContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
-import { FaSearch, FaSort } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 
 const Home = () => {
   const { users, getAllUsers } = useGlobalContext();
@@ -68,7 +68,7 @@ const Home = () => {
       </div>
 
       {/* Search and Sort Section */}
-      <div className="w-full max-w-4xl mb-6 md:mb-8 flex flex-col md:flex-row items-center gap-4 p-4 md:p-6 border rounded-md">
+      <div className="w-full max-w-4xl mb-6 md:mb-8 flex flex-col md:flex-row items-center gap-4 p-4 md:p-6 ">
         {/* Search Bar */}
         <div className="relative w-full md:flex-grow">
           <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -93,18 +93,6 @@ const Home = () => {
             </SelectContent>
           </Select>
         </div>
-
-        {/* Reset Filters Button */}
-        <Button
-          variant="outline"
-          onClick={() => {
-            setSearchQuery("");
-            setSortOrder("newest");
-          }}
-          className="w-full md:w-auto whitespace-nowrap"
-        >
-          Reset Filters
-        </Button>
       </div>
 
       {/* User Profiles Grid */}
@@ -114,7 +102,7 @@ const Home = () => {
             filteredUsers.map((user, index) => (
               <div
                 key={index}
-                className="transform transition-transform duration-300 hover:scale-105"
+                className=" flex justify-center items-center transform transition-transform duration-300 hover:scale-105"
               >
                 <ProfileCard {...user} />
               </div>
