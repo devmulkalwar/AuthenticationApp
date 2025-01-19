@@ -1,21 +1,32 @@
-import React from 'react';
-import { Card, CardContent, CardHeader } from './ui/card';
-import { FaTwitter, FaLinkedin, FaGithub, FaInstagram } from 'react-icons/fa';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns'; // Import date-fns for date formatting
+import React from "react";
+import { Card, CardContent, CardHeader } from "./ui/card";
+import { FaTwitter, FaLinkedin, FaGithub, FaInstagram } from "react-icons/fa";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns"; // Import date-fns for date formatting
+import { Link } from "react-router-dom";
 
-const ProfileCard = ({ profilePicture, name, email, bio, socialMedia, createdAt }) => {
+const ProfileCard = ({
+  profilePicture,
+  name,
+  email,
+  bio,
+  socialMedia,
+  createdAt,
+  _id
+}) => {
   // Format the date
-  const formattedDate = createdAt ? format(new Date(createdAt), 'MMMM yyyy') : 'Unknown';
+  const formattedDate = createdAt
+    ? format(new Date(createdAt), "MMMM yyyy")
+    : "Unknown";
 
   return (
-    <Card className={cn('flex flex-col items-center text-center')}>
-      <CardHeader className={cn('flex flex-col items-center')}>
+    <Card className={cn("flex flex-col items-center text-center")}>
+      <CardHeader className={cn("flex flex-col items-center")}>
         {/* Profile Picture */}
         <div className="w-24 h-24 mb-4 rounded-full overflow-hidden">
           <img
-            src={profilePicture || 'https://via.placeholder.com/150'}
-            alt={name || 'Profile Picture'}
+            src={profilePicture || "https://via.placeholder.com/150"}
+            alt={name || "Profile Picture"}
             className="w-full h-full object-cover"
           />
         </div>
@@ -72,6 +83,16 @@ const ProfileCard = ({ profilePicture, name, email, bio, socialMedia, createdAt 
         </div>
         {/* Member Since */}
         <p className="text-sm text-gray-500">Member since {formattedDate}</p>
+        {/* Profile Button */}
+       
+          <div className="mt-4">
+            <Link
+              to={`/profile/${_id || ""}`}
+              className="inline-block bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+            >
+              View Profile
+            </Link>
+        </div>
       </CardContent>
     </Card>
   );

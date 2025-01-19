@@ -3,7 +3,7 @@ import ProfileCard from "@/components/ProfileCard";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
 
 const Home = () => {
-  const { users , getAllUsers,user} = useGlobalContext(); // Fetch users from context
+  const { users , getAllUsers, user} = useGlobalContext(); // Fetch users from context
   
   // Check if users exist and handle loading or error states
   if (!users) {
