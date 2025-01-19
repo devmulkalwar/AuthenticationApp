@@ -21,6 +21,7 @@ export const ContextProvider = ({ children }) => {
     const toastType = {
       success: toast.success,
       error: toast.error,
+      info: toast.info,
     };
 
     if (toastType[status]) {
@@ -42,197 +43,245 @@ export const ContextProvider = ({ children }) => {
     setIsLoading(true);
     setMessage(null);
     setError(null);
-
+  
     try {
       const response = await axios.post(`${SERVER_URL}/register`, data, {
         withCredentials: true,
       });
-
+  
       console.log(response);
-
+  
       // Handle successful response
       const user = response.data.user;
       const message = response.data.message;
-
+  
       // Set user and message
       setUser(user);
       setMessage(message);
       setIsAuthenticated(true);
-
+  
+      // Display success toast
+      handleToast("Registration successful! Please verify your OTP.", "success");
+  
       // Navigate to the OTP verification page
-      navigate("/verify-otp"); // Adjust the route as per your app
+      navigate("/verify-otp"); 
     } catch (err) {
       console.error(err);
       const errorMessage = err.response?.data?.message || "Registration failed";
       setError(errorMessage);
-      throw err;
+  
+      // Display error toast
+      handleToast(errorMessage, "error");
+  
+      throw err; 
     } finally {
       // Stop loading spinner
       setIsLoading(false);
     }
   };
+  
+// Login function
+const login = async (data) => {
+  setIsLoading(true);
+  setMessage(null);
+  setError(null);
 
-  // Login function
-  const login = async (data) => {
-    setIsLoading(true);
-    setMessage(null);
-    setError(null);
-    try {
-      const response = await axios.post(`${SERVER_URL}/login`, data, {
+  try {
+    const response = await axios.post(`${SERVER_URL}/login`, data, {
+      withCredentials: true,
+    });
+
+    console.log(response);
+
+    // Handle successful response
+    const user = response.data.user;
+    const message = response.data.message;
+
+    // Set user and message
+    setUser(user);
+    setMessage(message);
+    setIsAuthenticated(true);
+
+    // Display success toast
+    handleToast("Login successful!", "success");
+
+    // Navigate to the home page
+    navigate("/");
+
+  } catch (err) {
+    console.error(err);
+    const errorMessage = err.response?.data?.message || "Login failed";
+    setError(errorMessage);
+
+    // Display error toast
+    handleToast(errorMessage, "error");
+
+    // Navigate to login page in case of error (you can remove this part if not required)
+    navigate("/login");
+    
+    throw err; // Re-throw error if needed
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
+// Logout function
+const logout = async () => {
+  setIsLoading(true);
+  setMessage(null);
+  setError(null);
+
+  try {
+    await axios.post(
+      `${SERVER_URL}/logout`,
+      {},
+      {
+        withCredentials: true, // Ensure cookies are sent with the request
+      }
+    );
+
+    // Clear user data and authentication state
+    setUser(null);
+    setIsAuthenticated(false);
+
+    // Display success toast
+    handleToast("Logged out successfully!", "success");
+
+    // Navigate to the login page
+    navigate("/login");
+
+  } catch (err) {
+    console.error(err);
+    const errorMessage = err.response?.data?.message || "Error in Logout";
+    setError(errorMessage);
+
+    // Display error toast
+    handleToast(errorMessage, "error");
+
+    throw err;
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
+// Email Verification function
+const verifyEmail = async (code) => {
+  setIsLoading(true);
+  setMessage(null);
+  setError(null);
+
+  try {
+    const response = await axios.post(
+      `${SERVER_URL}/verify-email`,
+      { code },
+      {
         withCredentials: true,
-      });
-      console.log(response);
+      }
+    );
 
-      // Handle successful response
-      const user = response.data.user;
+    // Set user data and authentication status
+    setUser(response.data.user);
+    setIsAuthenticated(true);
+
+    // Display success toast
+    handleToast("Email verified successfully!", "success");
+
+    // Navigate to the create profile page
+    navigate("/create-profile");
+
+  } catch (err) {
+    console.error(err);
+    const errorMessage =
+      err.response?.data?.message || "Error in email verification";
+    setError(errorMessage);
+
+    // Display error toast
+    handleToast(errorMessage, "error");
+
+    throw err;
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
+// Create user profile
+const createProfile = async (formData) => {
+  setIsLoading(true);
+  setMessage(null);
+  setError(null);
+
+  try {
+    const response = await axios.post(
+      `${SERVER_URL}/create-profile`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      }
+    );
+
+    if (response.status === 200) {
       const message = response.data.message;
-
-      // Set user and message
-      setUser(user);
       setMessage(message);
-      setIsAuthenticated(true);
-
-      navigate("/");
-    } catch (err) {
-      console.error(err);
-      const errorMessage = err.response.data.message;
-      setError(errorMessage);
-      navigate("/login");
-      throw err;
-    } finally {
-      setIsLoading(false);
+      handleToast(message, "success"); // Success toast
+      navigate("/"); // Navigate to the home page
+    } else {
+      throw new Error("Unexpected response from the server");
     }
-  };
+  } catch (err) {
+    const errorMessage =
+      err.response?.data?.message || "Error in creating profile";
+    setError(errorMessage);
+    handleToast(errorMessage, "error"); // Error toast
+    console.error("Error creating profile:", err);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
-  // Logout function
-  const logout = async () => {
-    setIsLoading(true);
-    setMessage(null);
-    setError(null);
-    try {
-      await axios.post(
-        `${SERVER_URL}/logout`,
-        {},
-        {
-          withCredentials: true, // Ensure cookies are sent with the request
-        }
-      );
-      setUser(null);
-      setIsAuthenticated(false);
 
-      navigate("/login");
-    } catch (err) {
-      console.error(err);
-      const errorMessage = err.response?.data?.message || "Error in Logout";
-      setError(errorMessage);
+// Edit user profile
+const editProfile = async (formData) => {
+  setIsLoading(true);
+  setMessage(null);
+  setError(null);
 
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Email Verification function
-  const verifyEmail = async (code) => {
-    setIsLoading(true);
-    setMessage(null);
-    setError(null);
-
-    try {
-      const response = await axios.post(
-        `${SERVER_URL}/verify-email`,
-        { code },
-        {
-          withCredentials: true,
-        }
-      );
-      setUser(response.data.user);
-      setIsAuthenticated(true);
-
-      navigate("/create-profile");
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Error in email verification";
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  //Create user profile
-  const createProfile = async (formData) => {
-    setIsLoading(true);
-    setMessage(null);
-    setError(null);
-
-    try {
-      const response = await axios.post(
-        `${SERVER_URL}/create-profile`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          withCredentials: true,
-        }
-      );
-
-      if (response.status === 200) {
-        const message = response.data.message;
-        setMessage(message);
-        handleToast(message, "success");
-        navigate("/");
-      } else {
-        throw new Error("Unexpected response from the server");
+  try {
+    const response = await axios.post(
+      `${SERVER_URL}/edit-profile`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
       }
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Error in creating profile";
-      setError(errorMessage);
-      handleToast(errorMessage, "error");
-      console.error("Error creating profile:", err);
-    } finally {
-      setIsLoading(false);
+    );
+
+    if (response.status === 200) {
+      const message = response.data.message;
+      setMessage(message);
+      handleToast(message, "success"); // Success toast
+      navigate("/profile"); // Navigate to the home page
+    } else {
+      throw new Error("Unexpected response from the server");
     }
-  };
+  } catch (err) {
+    const errorMessage =
+      err.response?.data?.message || "Error in editing profile";
+    setError(errorMessage);
+    handleToast(errorMessage, "error"); // Error toast
+    console.error("Error editing profile:", err);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
-  // Edit user profile
-  const editProfile = async (formData) => {
-    setIsLoading(true);
-    setMessage(null);
-    setError(null);
-
-    try {
-      const response = await axios.post(
-        `${SERVER_URL}/edit-profile`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          withCredentials: true,
-        }
-      );
-
-      if (response.status === 200) {
-        const message = response.data.message;
-        setMessage(message);
-        handleToast(message, "success");
-        navigate("/");
-      } else {
-        throw new Error("Unexpected response from the server");
-      }
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Error in editing profile";
-      setError(errorMessage);
-      handleToast(errorMessage, "error");
-      console.error("Error editing profile:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   // Check Auth Status function
   const checkAuth = async () => {
@@ -272,155 +321,125 @@ export const ContextProvider = ({ children }) => {
     }
   };
 
-  // Forgot Password function
-  const forgotPassword = async (email) => {
-    setIsLoading(true);
-    setError(null);
-    setMessage(null);
-    console.log(email);
-    try {
-      const response = await axios.post(
-        `${SERVER_URL}/forgot-password`,
-        {
-          email,
-        },
-        {
-          withCredentials: true,
-        }
-      );
-      console.log(response);
-      setMessage(response.data.message);
-      toast.success(message || "Reset password email sent successfully", {
-        position: "top-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Error in password reset";
-      setError(errorMessage);
-      toast.error(error, {
-        position: "top-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+ // Forgot Password function
+const forgotPassword = async (email) => {
+  setIsLoading(true);
+  setError(null);
+  setMessage(null);
+  console.log(email);
 
-  // Reset Password function
-  const resetPassword = async (token, password) => {
-    setIsLoading(true);
-    setError(null);
-    setMessage(null);
+  try {
+    const response = await axios.post(
+      `${SERVER_URL}/forgot-password`,
+      { email },
+      {
+        withCredentials: true,
+      }
+    );
+    console.log(response);
+    const successMessage = response.data.message || "Reset password email sent successfully";
+    setMessage(successMessage);
+    handleToast(successMessage, "success"); // Success toast
+  } catch (err) {
+    const errorMessage =
+      err.response?.data?.message || "Error in password reset";
+    setError(errorMessage);
+    handleToast(errorMessage, "error"); // Error toast
+    console.error(err);
+    throw err;
+  } finally {
+    setIsLoading(false);
+  }
+};
 
-    try {
-      const response = await axios.post(
-        `${SERVER_URL}/reset-password/${token}`, // Ensure URL is correct
-        { password },
-        { withCredentials: true }
-      );
+// Reset Password function
+const resetPassword = async (token, password) => {
+  setIsLoading(true);
+  setError(null);
+  setMessage(null);
 
-      setMessage(response.data.message);
-      toast.success(response.data.message || "Password Reset Successful", {
-        position: "top-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+  try {
+    const response = await axios.post(
+      `${SERVER_URL}/reset-password/${token}`, // Ensure URL is correct
+      { password },
+      { withCredentials: true }
+    );
 
-      setTimeout(() => {
-        navigate("/login");
-      }, 3000);
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Error in password reset";
-      setError(errorMessage);
-      toast.error(errorMessage, {
-        position: "top-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+    const successMessage = response.data.message || "Password Reset Successful";
+    setMessage(successMessage);
+    handleToast(successMessage, "success"); // Success toast
 
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  //Change Password
-  const changePassword = async (userId, currentPassword, newPassword) => {
-    setIsLoading(true);
-    setError(null);
-    setMessage(null);
-    try {
-      const response = await axios.post(
-        `${SERVER_URL}/change-password`,
-        { userId, currentPassword, newPassword },
-        { withCredentials: true }
-      );
-      console.log(response);
-      setMessage(response.data.message);
-      handleToast(message, "success");
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Error in changing password";
-      setError(errorMessage);
-      handleToast(errorMessage, "error");
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  //Delete Profile
-  const deleteProfile = async (password, userId) => {
-    setIsLoading(true);
-    setError(null);
-    setMessage(null);
-    try {
-      const response = await axios.post(
-        `${SERVER_URL}/delete-profile`,
-        { password, userId },
-        {
-          withCredentials: true,
-        }
-      );
-      console.log(response);
-      setMessage(response.data.message);
-      handleToast(message, "success");
+    setTimeout(() => {
       navigate("/login");
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Error in deleting profile";
-      setError(errorMessage);
-      handleToast(errorMessage, "error");
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    }, 3000);
+  } catch (err) {
+    const errorMessage =
+      err.response?.data?.message || "Error in password reset";
+    setError(errorMessage);
+    handleToast(errorMessage, "error"); // Error toast
+
+    throw err;
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+// Change Password
+const changePassword = async (userId, currentPassword, newPassword) => {
+  setIsLoading(true);
+  setError(null);
+  setMessage(null);
+  try {
+    const response = await axios.post(
+      `${SERVER_URL}/change-password`,
+      { userId, currentPassword, newPassword },
+      { withCredentials: true }
+    );
+    console.log(response);
+    const successMessage = response.data.message || "Password changed successfully";
+    setMessage(successMessage);
+    handleToast(successMessage, "success"); // Success toast
+  } catch (err) {
+    const errorMessage =
+      err.response?.data?.message || "Error in changing password";
+    setError(errorMessage);
+    handleToast(errorMessage, "error"); // Error toast
+    throw err;
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
+// Delete Profile
+const deleteProfile = async (password, userId) => {
+  setIsLoading(true);
+  setError(null);
+  setMessage(null);
+  try {
+    const response = await axios.post(
+      `${SERVER_URL}/delete-profile`,
+      { password, userId },
+      {
+        withCredentials: true,
+      }
+    );
+    console.log(response);
+    const successMessage = response.data.message || "Profile deleted successfully";
+    setMessage(successMessage);
+    handleToast(successMessage, "success"); // Success toast
+    navigate("/login");
+  } catch (err) {
+    const errorMessage =
+      err.response?.data?.message || "Error in deleting profile";
+    setError(errorMessage);
+    handleToast(errorMessage, "error"); // Error toast
+    throw err;
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   // Get all users
   const getAllUsers = async (userId) => {
@@ -480,6 +499,7 @@ export const ContextProvider = ({ children }) => {
     createProfile,
     editProfile,
     getAllUsers,
+    handleToast
   };
 
   return (

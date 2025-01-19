@@ -35,10 +35,10 @@ const Header = () => {
     }
   }, [isDarkMode]);
 
-  const handleLogout = () => {
-    logout();
-    alert("Logged out successfully");
+  const handleLogout = async () => {
+    await logout();
   };
+  
   return (
     <Navbar>
       <NavbarHeader>

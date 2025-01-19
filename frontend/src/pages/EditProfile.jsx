@@ -5,8 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+
 const EditProfile = () => {
-  const { user, editProfile } = useGlobalContext();
+  const { user, editProfile,handleToast } = useGlobalContext();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [bio, setBio] = useState("");
@@ -15,7 +16,6 @@ const EditProfile = () => {
   const [twitter, setTwitter] = useState("");
   const [github, setGithub] = useState("");
   const [linkedin, setLinkedin] = useState("");
-  const [message, setMessage] = useState("");
 
   // Track the initial values for comparison
   const [initialValues, setInitialValues] = useState({});
@@ -38,7 +38,7 @@ const EditProfile = () => {
     e.preventDefault();
 
     if (!hasChanges()) {
-      setMessage("No changes detected.");
+      handleToast("No changes detected.", "info"); // Use info toast for no changes
       return; // Don't submit if there are no changes
     }
 
@@ -57,12 +57,8 @@ const EditProfile = () => {
       formData.append("profilePicture", profilePicture);
     }
 
-    try {
       await editProfile(formData);
-      setMessage("Profile updated successfully!");
-    } catch (error) {
-      setMessage("Error occurred while updating profile.");
-    }
+   
   };
 
   const handleProfilePictureChange = (e) => {
@@ -106,7 +102,7 @@ const EditProfile = () => {
 
   return (
     <div className="flex flex-grow w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-4xl">
+      <div className="w-full max-w-2xl">
         {/* Edit Profile Section */}
         <Card className="flex flex-col gap-6">
           <CardHeader>
@@ -191,17 +187,6 @@ const EditProfile = () => {
                 Save Changes
               </Button>
             </form>
-
-            {/* Success/Error Message */}
-            {message && (
-              <p
-                className={`mt-4 text-center ${
-                  message.includes("successfully") ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                {message}
-              </p>
-            )}
           </CardContent>
         </Card>
       </div>
