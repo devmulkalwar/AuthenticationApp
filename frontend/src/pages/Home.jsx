@@ -3,6 +3,7 @@ import ProfileCard from "@/components/ProfileCard";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
 import { FaSearch, FaSort } from "react-icons/fa";
 
 const Home = () => {
@@ -13,11 +14,11 @@ const Home = () => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [usersArray, setUsersArray] = useState([]);
 
-    useEffect(() => {
-      if (users) {
-        setUsersArray(users);
-      }
-    }, [users]);
+  useEffect(() => {
+    if (users) {
+      setUsersArray(users);
+    }
+  }, [users]);
 
   useEffect(() => {
     const filtered = usersArray.filter((user) => {
@@ -44,7 +45,7 @@ const Home = () => {
 
   if (!users) {
     return (
-      <div className="flex flex-grow w-full items-center justify-center p-6 md:p-10">
+      <div className="flex flex-grow w-full items-center justify-center p-4 md:p-6">
         <p>Loading users...</p>
       </div>
     );
@@ -52,45 +53,45 @@ const Home = () => {
 
   if (users.length === 0) {
     return (
-      <div className="flex flex-grow w-full items-center justify-center p-6 md:p-10">
+      <div className="flex flex-grow w-full items-center justify-center p-4 md:p-6">
         <p>No users found. Please check back later.</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col w-full items-center justify-center p-6 md:p-10 min-h-screen">
+    <div className="flex flex-col w-full items-center justify-center p-4 md:p-6 lg:p-8 min-h-screen">
       {/* Page Heading */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-2">User Profiles</h1>
-        <p>Browse and discover user profiles.</p>
+      <div className="text-center mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold mb-2">User Profiles</h1>
+        <p className="text-sm md:text-base">Browse and discover user profiles.</p>
       </div>
 
       {/* Search and Sort Section */}
-      <div className="w-full max-w-4xl mb-8 flex flex-wrap items-center gap-4 p-6 border rounded-md">
+      <div className="w-full max-w-4xl mb-6 md:mb-8 flex flex-col md:flex-row items-center gap-4 p-4 md:p-6 border rounded-md">
         {/* Search Bar */}
-        <div className="relative flex-grow">
-          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2" />
+        <div className="relative w-full md:flex-grow">
+          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <Input
             type="text"
-            placeholder="Search by name or email..."
+            placeholder="Search by name ..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 w-full"
           />
         </div>
 
-        {/* Sort by Creation Date Dropdown */}
-        <div className="relative">
-          <FaSort className="absolute left-3 top-1/2 transform -translate-y-1/2" />
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            className="pl-10 pr-4 py-2 border rounded appearance-none"
-          >
-            <option value="newest">Newest Profiles</option>
-            <option value="oldest">Oldest Profiles</option>
-          </select>
+        {/* Sort Dropdown */}
+        <div className="relative w-full md:w-auto">
+          <Select value={sortOrder} onValueChange={(value) => setSortOrder(value)}>
+            <SelectTrigger className="w-full md:w-[200px]">
+              {sortOrder === "newest" ? "Newest Profiles" : "Oldest Profiles"}
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">Newest Profiles</SelectItem>
+              <SelectItem value="oldest">Oldest Profiles</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Reset Filters Button */}
@@ -100,7 +101,7 @@ const Home = () => {
             setSearchQuery("");
             setSortOrder("newest");
           }}
-          className="whitespace-nowrap"
+          className="w-full md:w-auto whitespace-nowrap"
         >
           Reset Filters
         </Button>
@@ -108,15 +109,18 @@ const Home = () => {
 
       {/* User Profiles Grid */}
       <div className="w-full max-w-4xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {filteredUsers.length > 0 ? (
             filteredUsers.map((user, index) => (
-              <div key={index} className="transform transition-transform duration-300">
+              <div
+                key={index}
+                className="transform transition-transform duration-300 hover:scale-105"
+              >
                 <ProfileCard {...user} />
               </div>
             ))
           ) : (
-            <p className="text-center col-span-full">
+            <p className="text-center col-span-full text-gray-600">
               No users match your search or filters.
             </p>
           )}
