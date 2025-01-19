@@ -1,19 +1,27 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom"; // To extract URL parameters
+import { Navigate, useParams } from "react-router-dom"; // To extract URL parameters
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils"; // Utility for className merging
 import { useGlobalContext } from "@/hooks/useGlobalContext";
 
 const ResetPassword = () => {
-  const{resetPassword} = useGlobalContext();
+  const { resetPassword } = useGlobalContext();
   const { token } = useParams(); // Extract the token from the URL
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const storedUser = localStorage.getItem("user");
+  if (storedUser) {
+    return <Navigate to="/" replace />;
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -27,7 +35,7 @@ const ResetPassword = () => {
       return;
     }
 
-    await resetPassword(token, newPassword)
+    await resetPassword(token, newPassword);
   };
 
   return (
@@ -65,7 +73,9 @@ const ResetPassword = () => {
             {message && (
               <p
                 className={`mt-4 text-center ${
-                  message.includes("successfully") ? "text-green-600" : "text-red-600"
+                  message.includes("successfully")
+                    ? "text-green-600"
+                    : "text-red-600"
                 }`}
               >
                 {message}

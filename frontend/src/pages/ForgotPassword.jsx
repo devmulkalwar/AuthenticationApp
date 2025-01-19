@@ -9,12 +9,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils"; // Utility for className merging
 import { useGlobalContext } from "@/hooks/useGlobalContext";
+import { Navigate } from "react-router-dom";
 
 const ForgotPassword = () => {
   const { forgotPassword, setError, user, setMessage } = useGlobalContext();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false); // Added loading state for better UX
-
+  const storedUser = localStorage.getItem("user");
+  if (storedUser) {
+    return <Navigate to="/" replace />;
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -24,7 +28,6 @@ const ForgotPassword = () => {
       return;
     }
     forgotPassword(email);
-    
   };
 
   return (

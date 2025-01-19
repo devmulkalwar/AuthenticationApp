@@ -6,15 +6,24 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { cn } from "@/lib/utils"; // Ensure you have this utility for className merging
 import { useGlobalContext } from "@/hooks/useGlobalContext";
+import { Navigate } from "react-router-dom";
 
 export default function Otp() {
-  const { verifyEmail,handleToast } = useGlobalContext();
+  const { verifyEmail, handleToast } = useGlobalContext();
   const [otp, setOtp] = useState("");
   const [message, setMessage] = useState("");
-
+  const storedUser = localStorage.getItem("user");
+  if (storedUser) {
+    return <Navigate to="/" replace />;
+  }
   const handleVerify = () => {
     if (otp === "") {
       handleToast("Please enter the OTP", "error");
@@ -53,7 +62,7 @@ export default function Otp() {
             </InputOTP>
             <Button className="w-2/3 mt-4" onClick={handleVerify}>
               Verify
-            </Button> 
+            </Button>
           </div>
         </Card>
       </div>
