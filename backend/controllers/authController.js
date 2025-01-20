@@ -456,7 +456,7 @@ export const deleteProfile = async (req, res) => {
 
     // Delete the user
     await User.findByIdAndDelete(userId);
-
+    res.clearCookie("token");
     res
       .status(200)
       .json({ success: true, message: "Profile deleted successfully" });

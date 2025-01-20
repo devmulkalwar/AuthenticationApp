@@ -161,8 +161,8 @@ const Profile = () => {
                 />
               </div>
               <h2 className="text-xl font-semibold text-foreground">{name}</h2>
-              <p className="text-sm text-muted-foreground">{email}</p>
-              <p className="text-sm text-muted-foreground mt-2">{bio}</p>
+              <p className="text-sm text-center text-muted-foreground">{email}</p>
+              <p className="text-sm text-center text-muted-foreground mt-2">{bio}</p>
             </CardHeader>
             <CardContent className="flex flex-col items-center">
               <div className="flex justify-center space-x-4 mb-4">
