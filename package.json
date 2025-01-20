@@ -1,13 +1,13 @@
 {
   "name": "authenticationapp",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend for Authentication App",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon ./backend/index.js",
     "start": "cross-env NODE_ENV=production node ./backend/index.js",
-    "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend"
+    "build": "npm install" 
   },
   "author": "",
   "license": "ISC",
