@@ -19,7 +19,7 @@ connectDB();
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173", // Use environment variable for frontend URL
-    credentials: true, // Allow cookies
+    credentials: true, 
   })
 );
 app.use(express.json()); // Parse JSON requests
