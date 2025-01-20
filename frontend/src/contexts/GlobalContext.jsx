@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { GlobalContext } from "@/hooks/useGlobalContext";
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+const SERVER_URL = `${import.meta.env.VITE_SERVER_URL}/api/auth`;
 // Create a provider component
 export const ContextProvider = ({ children }) => {
   const navigate = useNavigate();
