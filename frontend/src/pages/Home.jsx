@@ -13,7 +13,7 @@ import { FaSearch, FaSpinner } from "react-icons/fa";
 import { Navigate } from "react-router-dom";
 
 const Home = () => {
-  const { users, user,isAuthenticated } = useGlobalContext();
+  const { users, user,isAuthenticated , checkAuth } = useGlobalContext();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
