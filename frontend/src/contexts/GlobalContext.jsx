@@ -4,8 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { GlobalContext } from "@/hooks/useGlobalContext";
 
-// const SERVER_URL = "http://localhost:3000/api/auth";
-const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+const SERVER_URL =
+  import.meta.env.VITE_MODE === "development"
+    ? "http://localhost:3000/api/auth"
+    : "/api/auth";
 
 // Create a provider component
 export const ContextProvider = ({ children }) => {
@@ -44,38 +46,40 @@ export const ContextProvider = ({ children }) => {
     setIsLoading(true);
     setMessage(null);
     setError(null);
-  
+
     try {
       const response = await axios.post(`${SERVER_URL}/register`, data, {
         withCredentials: true,
       });
-  
+
       // Handle successful response
       const user = response.data.user;
       const message = response.data.message;
-  
+
       // Set user and authentication state
       setUser(user);
       setMessage(message);
       setIsAuthenticated(true);
-  
+
       // Save user data to localStorage
       localStorage.setItem("user", JSON.stringify(user));
-  
-      handleToast("Registration successful! Please verify your OTP.", "success");
-  
+
+      handleToast(
+        "Registration successful! Please verify your OTP.",
+        "success"
+      );
+
       await checkAuth();
 
       navigate("/verify-otp");
     } catch (err) {
       const errorMessage = err.response?.data?.message || "Registration failed";
       setError(errorMessage);
-  
+
       handleToast(errorMessage, "error");
-  
-      throw err; 
+
+      throw err;
     } finally {
-      
       setIsLoading(false);
     }
   };
@@ -293,7 +297,7 @@ export const ContextProvider = ({ children }) => {
         setMessage(message);
         handleToast(message, "success"); // Success toast
         await checkAuth();
-        navigate(`/profile/${updatedProfileData._id}`);// Navigate to the profile page
+        navigate(`/profile/${updatedProfileData._id}`); // Navigate to the profile page
       } else {
         throw new Error("Unexpected response from the server");
       }
@@ -528,7 +532,7 @@ export const ContextProvider = ({ children }) => {
   // Execute checkAuth when the component mounts
   useEffect(() => {
     checkAuth();
-  },[]);
+  }, []);
 
   // Memoize the context value to avoid unnecessary re-renders
   const contextValue = {
