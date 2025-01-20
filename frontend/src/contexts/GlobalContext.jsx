@@ -69,7 +69,7 @@ export const ContextProvider = ({ children }) => {
         "Registration successful! Please verify your OTP.",
         "success"
       );
-
+      await checkAuth();
       // Navigate to the OTP verification page
       navigate("/verify-otp");
     } catch (err) {
@@ -114,7 +114,7 @@ export const ContextProvider = ({ children }) => {
 
       // Display success toast
       handleToast("Login successful!", "success");
-
+      await checkAuth();
       // Navigate to the home page
       navigate("/");
     } catch (err) {

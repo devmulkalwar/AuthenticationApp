@@ -4,34 +4,47 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/dbConnection.js";
 import authRoutes from "./routes/authRoutes.js";
+import path from "path";
 
+// Load environment variables
 dotenv.config();
 
+// Initialize Express app
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
+
+// Resolve the current directory
+const __dirname = path.resolve();
 
 // Database connection
 connectDB();
 
 // Middleware
-
-// Enable CORS with credentials to allow cookies to be sent and received
-app.use(cors({
-  origin: "http://localhost:5173", // Frontend URL
-  credentials: true,               // Allow cookies
-}));
-
-app.use(express.json()); // To parse JSON requests
-app.use(express.urlencoded({ extended: true })); // To parse URL-encoded data (like form-data)
-app.use(cookieParser()); // To parse cookies in incoming requests
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Frontend URL
+    credentials: true, // Allow cookies
+  })
+);
+app.use(express.json()); // Parse JSON requests
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded data
+app.use(cookieParser()); // Parse cookies
 
 // Routes
-app.use("/api/auth", authRoutes); // All authentication-related routes
+app.use("/api/auth", authRoutes); // Authentication routes
 
-// Error handling (optional, but recommended for debugging)
+// Serve static files in production
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "/frontend/dist")));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "/frontend/dist/index.html"));
+  });
+}
+
+// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send({
+  res.status(500).json({
     status: "error",
     message: "Something went wrong! Please try again later.",
   });
