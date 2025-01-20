@@ -345,13 +345,13 @@ export const ContextProvider = ({ children }) => {
           const user = response.data.user;
 
           setUser(user);
+          getAllUsers(user._id);
           setIsAuthenticated(true);
 
           // Save user data to localStorage for future use
           localStorage.setItem("user", JSON.stringify(user));
 
           console.log(user._id);
-          getAllUsers(user._id);
         } else {
           setUser(null);
           setIsAuthenticated(false);
@@ -533,7 +533,7 @@ export const ContextProvider = ({ children }) => {
   // Execute checkAuth when the component mounts
   useEffect(() => {
     checkAuth();
-  }, []);
+  },[]);
 
   // Memoize the context value to avoid unnecessary re-renders
   const contextValue = {

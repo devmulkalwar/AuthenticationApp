@@ -15,20 +15,28 @@ import {
 import { cn } from "@/lib/utils"; // Ensure you have this utility for className merging
 import { useGlobalContext } from "@/hooks/useGlobalContext";
 import { Navigate } from "react-router-dom";
+import { FaSpinner } from "react-icons/fa"; // Import spinner icon from react-icons
 
 export default function Otp() {
   const { verifyEmail, handleToast } = useGlobalContext();
   const [otp, setOtp] = useState("");
   const [message, setMessage] = useState("");
-  const storedUser = localStorage.getItem("user");
-  if (storedUser) {
-    return <Navigate to="/" replace />;
-  }
-  const handleVerify = () => {
+  const [isLoading, setIsLoading] = useState(false); // Loading state
+
+  const handleVerify = async (e) => {
+    e.preventDefault(); // Prevent default form submission behavior
+
     if (otp === "") {
       handleToast("Please enter the OTP", "error");
     } else {
-      verifyEmail(otp);
+      setIsLoading(true); // Set loading to true
+      try {
+        await verifyEmail(otp); // Call the verifyEmail function
+      } catch (error) {
+        console.log(error)
+      } finally {
+        setIsLoading(false); // Reset loading state
+      }
     }
   };
 
@@ -43,26 +51,39 @@ export default function Otp() {
             </CardDescription>
           </CardHeader>
           <div className="flex flex-col items-center justify-center gap-4 p-6 pt-0">
-            <InputOTP
-              maxLength={6}
-              value={otp}
-              onChange={(value) => setOtp(value)}
-            >
-              <InputOTPGroup>
-                <InputOTPSlot index={0} />
-                <InputOTPSlot index={1} />
-                <InputOTPSlot index={2} />
-              </InputOTPGroup>
-              <InputOTPSeparator />
-              <InputOTPGroup>
-                <InputOTPSlot index={3} />
-                <InputOTPSlot index={4} />
-                <InputOTPSlot index={5} />
-              </InputOTPGroup>
-            </InputOTP>
-            <Button className="w-2/3 mt-4" onClick={handleVerify}>
-              Verify
-            </Button>
+            <form onSubmit={handleVerify} className="w-full flex flex-col items-center gap-4">
+              <InputOTP
+                maxLength={6}
+                value={otp}
+                onChange={(value) => setOtp(value)}
+              >
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                </InputOTPGroup>
+                <InputOTPSeparator />
+                <InputOTPGroup>
+                  <InputOTPSlot index={3} />
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+                </InputOTPGroup>
+              </InputOTP>
+              <Button
+                type="submit" // Set button type to submit
+                className="w-2/3 mt-4"
+                disabled={isLoading} // Disable button when loading
+              >
+                {isLoading ? ( // Show spinner when loading
+                  <>
+                    <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  "Verify"
+                )}
+              </Button>
+            </form>
           </div>
         </Card>
       </div>

@@ -12,6 +12,8 @@ import {
 import { useGlobalContext } from "@/hooks/useGlobalContext";
 import { Link, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import DeleteProfileModal from "@/components/DeleteProfileModal"; // Import DeleteProfileModal
+import ChangePasswordModal from "@/components/ChangePasswordModal"; // Import ChangePasswordModal
 
 const Profile = () => {
   const {
@@ -28,10 +30,8 @@ const Profile = () => {
   const [owner, setOwner] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
-  const [password, setPassword] = useState("");
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   // Effect to set the logged-in user
   useEffect(() => {
@@ -94,31 +94,33 @@ const Profile = () => {
       })
     : "Unknown date";
 
-  const handleDeleteProfile = async () => {
+  const handleDeleteProfile = async (password) => {
+    setIsDeleting(true);
     try {
       await deleteProfile(password, owner._id);
-      handleToast("Profile deleted successfully.", "success");
       setShowDeleteModal(false);
     } catch (error) {
       console.error("Error deleting profile:", error);
-      handleToast("Failed to delete profile. Please ensure your password is correct.", "error");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
-  const handleChangePassword = async () => {
+  const handleChangePassword = async (oldPassword, newPassword, confirmNewPassword) => {
     if (newPassword !== confirmNewPassword) {
       setErrorMessage("New passwords do not match.");
       handleToast("New passwords do not match.", "error");
       return;
     }
 
+    setIsChangingPassword(true);
     try {
       await changePassword(owner._id, oldPassword, newPassword);
-      handleToast("Password changed successfully.", "success");
       setShowChangePasswordModal(false);
     } catch (error) {
       console.error("Error changing password:", error);
-      handleToast("Failed to change password. Please check your old password.", "error");
+    } finally {
+      setIsChangingPassword(false);
     }
   };
 
@@ -241,77 +243,20 @@ const Profile = () => {
 
           {/* Delete Profile Modal */}
           {showDeleteModal && (
-            <div className="fixed inset-0 bg-background/90 flex justify-center items-center p-6">
-              <div className="bg-card flex flex-col items-center justify-center p-6 rounded-md shadow-md w-80 border border-muted">
-                <h3 className="text-lg font-semibold mb-4 text-foreground">
-                  Confirm Deletion
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Please enter your password to confirm profile deletion.
-                </p>
-                <Input
-                  type="password"
-                  className="mb-4"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <div className="flex justify-around w-full space-x-4">
-                  <Button
-                    onClick={() => setShowDeleteModal(false)}
-                    variant="default"
-                  >
-                    Cancel
-                  </Button>
-                  <Button onClick={handleDeleteProfile} variant="destructive">
-                    Delete
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <DeleteProfileModal
+              setShowDeleteModal={setShowDeleteModal}
+              handleDeleteProfile={handleDeleteProfile}
+              isDeleting={isDeleting}
+            />
           )}
 
           {/* Change Password Modal */}
           {showChangePasswordModal && (
-            <div className="fixed inset-0 bg-background/90 flex justify-center items-center p-6">
-              <div className="bg-card flex flex-col items-center justify-center p-6 rounded-md shadow-md w-80 border border-muted">
-                <h3 className="text-lg font-semibold mb-4 text-foreground">
-                  Change Password
-                </h3>
-                <Input
-                  type="password"
-                  className="mb-4"
-                  placeholder="Old Password"
-                  value={oldPassword}
-                  onChange={(e) => setOldPassword(e.target.value)}
-                />
-                <Input
-                  type="password"
-                  className="mb-4"
-                  placeholder="New Password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                />
-                <Input
-                  type="password"
-                  className="mb-4"
-                  placeholder="Confirm New Password"
-                  value={confirmNewPassword}
-                  onChange={(e) => setConfirmNewPassword(e.target.value)}
-                />
-                <div className="flex justify-around w-full space-x-4">
-                  <Button
-                    onClick={() => setShowChangePasswordModal(false)}
-                    variant="default"
-                  >
-                    Cancel
-                  </Button>
-                  <Button onClick={handleChangePassword} variant="destructive">
-                    Change Password
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <ChangePasswordModal
+              setShowChangePasswordModal={setShowChangePasswordModal}
+              handleChangePassword={handleChangePassword}
+              isChangingPassword={isChangingPassword}
+            />
           )}
         </div>
       </div>

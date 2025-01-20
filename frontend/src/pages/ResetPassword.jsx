@@ -10,32 +10,42 @@ import {
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils"; // Utility for className merging
 import { useGlobalContext } from "@/hooks/useGlobalContext";
+import { FaSpinner } from "react-icons/fa"; // Import spinner icon from react-icons
 
 const ResetPassword = () => {
-  const { resetPassword } = useGlobalContext();
+  const { resetPassword, handleToast } = useGlobalContext();
   const { token } = useParams(); // Extract the token from the URL
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const storedUser = localStorage.getItem("user");
+
   if (storedUser) {
     return <Navigate to="/" replace />;
   }
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default form submission behavior
 
     if (!newPassword || !confirmPassword) {
-      setMessage("Please fill in both fields.");
+      handleToast("Please enter both password and confirm password", "error");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setMessage("Passwords do not match. Please try again.");
+      handleToast("Passwords do not match", "error");
       return;
     }
 
-    await resetPassword(token, newPassword);
+    setLoading(true); // Set loading to true
+    try {
+      await resetPassword(token, newPassword);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false); // Reset loading state
+    }
   };
 
   return (
@@ -67,20 +77,16 @@ const ResetPassword = () => {
                 disabled={loading}
               />
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Resetting..." : "Reset Password"}
+                {loading ? ( // Show spinner when loading
+                  <>
+                    <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
+                    Resetting...
+                  </>
+                ) : (
+                  "Reset Password"
+                )}
               </Button>
             </form>
-            {message && (
-              <p
-                className={`mt-4 text-center ${
-                  message.includes("successfully")
-                    ? "text-green-600"
-                    : "text-red-600"
-                }`}
-              >
-                {message}
-              </p>
-            )}
           </div>
         </Card>
       </div>

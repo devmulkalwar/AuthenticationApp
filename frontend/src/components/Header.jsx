@@ -28,8 +28,9 @@ const Header = () => {
   };
 
   useEffect(() => {
-    if (user) {
-      setCurrentUser(user);
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) {
+      setCurrentUser(storedUser);
     }
   }, [user]);
 
@@ -94,7 +95,7 @@ const Header = () => {
           <NavbarMenu className="order-3 hidden md:flex">
             <NavbarLinks>
               <NavbarLink to="/">Home</NavbarLink>
-              <NavbarLink to={`/profile/${currentUser?._id || ""}`}>
+              <NavbarLink to={`/profile/${currentUser?._id}`}>
                 Profile
               </NavbarLink>
               <NavbarLink to="/contact">Contact</NavbarLink>

@@ -10,24 +10,34 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils"; // Utility for className merging
 import { useGlobalContext } from "@/hooks/useGlobalContext";
 import { Navigate } from "react-router-dom";
+import { FaSpinner } from "react-icons/fa"; // Import spinner icon from react-icons
 
 const ForgotPassword = () => {
-  const { forgotPassword, setError, user, setMessage } = useGlobalContext();
+  const { forgotPassword, handleToast, user, setMessage } = useGlobalContext();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false); // Added loading state for better UX
+ 
   const storedUser = localStorage.getItem("user");
   if (storedUser) {
     return <Navigate to="/" replace />;
   }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email) {
-      setError("Please enter a valid email address.");
-      handleToast("Please enter a valid email address.");
+      handleToast("Please enter your email", "error");
       return;
     }
-    forgotPassword(email);
+
+    setLoading(true); // Set loading to true
+    try {
+      await forgotPassword(email); // Call the forgotPassword function
+    } catch (error) {
+     console.log(error); //
+    } finally {
+      setLoading(false); // Reset loading state
+    }
   };
 
   return (
@@ -51,8 +61,14 @@ const ForgotPassword = () => {
                 disabled={loading} // Disable input while submitting
               />
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Sending..." : "Submit"}{" "}
-                {/* Button shows loading state */}
+                {loading ? ( // Show spinner when loading
+                  <>
+                    <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  "Submit"
+                )}
               </Button>
             </form>
           </div>

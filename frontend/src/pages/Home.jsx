@@ -76,9 +76,9 @@ const Home = () => {
   }
 
   return (
-    <div className="flex flex-col w-full items-center justify-center p-4 md:p-6 lg:p-8 min-h-screen">
+    <div className="flex-grow flex flex-col w-full items-center justify-center p-4 md:p-6 lg:p-8 min-h-screen">
       {/* Page Heading */}
-      <div className="text-center mb-6 md:mb-8">
+      <div className="sticky top-0 text-center mb-6 md:mb-8">
         <h1 className="text-2xl md:text-3xl font-bold mb-2">User Profiles</h1>
         <p className="text-sm md:text-base">
           Browse and discover user profiles.
@@ -86,7 +86,7 @@ const Home = () => {
       </div>
 
       {/* Search and Sort Section */}
-      <div className="w-full max-w-4xl mb-6 md:mb-8 flex flex-col md:flex-row items-center gap-4 p-4 md:p-6 ">
+      <div className="w-full max-w-4xl mb-6 md:mb-8 flex flex-col sm:flex-row items-center gap-4 p-4 md:p-6 ">
         {/* Search Bar */}
         <div className="relative w-full md:flex-grow">
           <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
