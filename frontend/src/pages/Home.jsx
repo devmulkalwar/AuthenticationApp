@@ -18,27 +18,16 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [usersArray, setUsersArray] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
+ 
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   useEffect(() => {
-    if (user) {
-      setCurrentUser(user);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (users) {
-      setUsersArray(users);
-    }
-  }, [users]);
-
-  useEffect(() => {
-    const filtered = usersArray.filter((user) => {
+    const filtered = users.filter((user) => {
       const matchesSearch =
         user.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.email.toLowerCase().includes(searchQuery.toLowerCase());
-
       return matchesSearch;
     });
 
@@ -54,7 +43,7 @@ const Home = () => {
     });
 
     setFilteredUsers(sorted);
-  }, [usersArray, searchQuery, sortOrder]);
+  }, [users, searchQuery, sortOrder]);
 
 
   const storedUser = JSON.parse(localStorage.getItem("user"));
