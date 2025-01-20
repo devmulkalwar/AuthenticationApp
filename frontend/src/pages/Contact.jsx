@@ -68,7 +68,10 @@ const Contact = () => {
       );
   };
   
-
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  if (storedUser && !storedUser.isProfileComplete) {
+    return <Navigate to="/create-profile" replace />;
+  }
 
   return (
     <div className="flex flex-grow w-full items-center justify-center p-6 md:p-10">

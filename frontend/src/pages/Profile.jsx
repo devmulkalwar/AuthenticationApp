@@ -10,7 +10,7 @@ import {
   FaShare,
 } from "react-icons/fa";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import DeleteProfileModal from "@/components/DeleteProfileModal"; // Import DeleteProfileModal
 import ChangePasswordModal from "@/components/ChangePasswordModal"; // Import ChangePasswordModal
@@ -142,6 +142,11 @@ const Profile = () => {
   // Check if the current profile belongs to the logged-in user
   const isOwner = currentUser?._id === owner?._id;
 
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  if (storedUser && !storedUser.isProfileComplete) {
+    return <Navigate to="/create-profile" replace />;
+  }
+  
   return (
     <div className="flex flex-grow w-full items-center justify-center p-6">
       <div className="w-full max-w-sm">

@@ -44,45 +44,38 @@ export const ContextProvider = ({ children }) => {
     setIsLoading(true);
     setMessage(null);
     setError(null);
-
+  
     try {
       const response = await axios.post(`${SERVER_URL}/register`, data, {
         withCredentials: true,
       });
-
-      console.log(response);
-
+  
       // Handle successful response
       const user = response.data.user;
       const message = response.data.message;
-
+  
       // Set user and authentication state
       setUser(user);
       setMessage(message);
       setIsAuthenticated(true);
-
+  
       // Save user data to localStorage
       localStorage.setItem("user", JSON.stringify(user));
-
-      // Display success toast
-      handleToast(
-        "Registration successful! Please verify your OTP.",
-        "success"
-      );
+  
+      handleToast("Registration successful! Please verify your OTP.", "success");
+  
       await checkAuth();
-      // Navigate to the OTP verification page
+
       navigate("/verify-otp");
     } catch (err) {
-      console.error(err);
       const errorMessage = err.response?.data?.message || "Registration failed";
       setError(errorMessage);
-
-      // Display error toast
+  
       handleToast(errorMessage, "error");
-
-      throw err; // Propagate the error if needed
+  
+      throw err; 
     } finally {
-      // Stop loading spinner
+      
       setIsLoading(false);
     }
   };

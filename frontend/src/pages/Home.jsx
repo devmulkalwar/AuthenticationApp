@@ -56,6 +56,12 @@ const Home = () => {
     setFilteredUsers(sorted);
   }, [usersArray, searchQuery, sortOrder]);
 
+
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  if (storedUser && !storedUser.isProfileComplete) {
+    return <Navigate to="/create-profile" replace />;
+  }
+  
   if (!users) {
     return (
       <div className="flex flex-grow w-full items-center justify-center p-4 md:p-6">
