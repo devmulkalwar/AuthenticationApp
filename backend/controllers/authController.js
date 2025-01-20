@@ -8,7 +8,7 @@ import {
   sendVerificationEmail,
   sendWelcomeEmail,
 } from "../nodemailer/emails.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { deleteImageBySecureUrl, uploadOnCloudinary } from "../utils/cloudinary.js";
 import fs from "fs";
 import dotenv from "dotenv";
 dotenv.config();
@@ -392,36 +392,43 @@ export const updateProfile = async (req, res) => {
     // Handle profile picture upload if a file is provided
     if (profilePictureFile) {
       tempFilePath = profilePictureFile.path; // Get the temporary file path
-      const cloudinaryResult = await uploadOnCloudinary(tempFilePath); // Upload file to Cloudinary
 
-      if (cloudinaryResult.error) {
-        return res.status(500).json({
-          success: false,
-          message: "Error uploading profile picture to Cloudinary",
-        });
+      // Upload the new profile picture to Cloudinary
+      const cloudinaryResult = await uploadOnCloudinary(tempFilePath);
+
+      if (!cloudinaryResult || !cloudinaryResult.secure_url) {
+        throw new Error("Error uploading profile picture to Cloudinary");
       }
-      profilePictureUrl = cloudinaryResult.url; // Extract URL from Cloudinary response
+
+      // New profile picture successfully uploaded
+      profilePictureUrl = cloudinaryResult.secure_url;
+
+      // Delete the old profile picture from Cloudinary (if it exists)
+      if (user.profilePicture) {
+        const deleteResponse = await deleteImageBySecureUrl(user.profilePicture);
+        console.log("Old profile picture deleted:", deleteResponse);
+      }
     }
 
     // Update the user's fields only if new data is provided
     user.fullName = fullName || user.fullName;
-    user.bio = bio || user.bio; // Only update if new name is provided
-    user.profilePicture = profilePictureUrl || user.profilePicture; // Update picture if uploaded
+    user.bio = bio || user.bio;
+    user.profilePicture = profilePictureUrl || user.profilePicture;
     if (socialMedia) {
-      if (socialMedia.instagram)
-        user.socialMedia.instagram = socialMedia.instagram;
-      if (socialMedia.twitter) user.socialMedia.twitter = socialMedia.twitter;
-      if (socialMedia.github) user.socialMedia.github = socialMedia.github;
-      if (socialMedia.linkedin)
-        user.socialMedia.linkedin = socialMedia.linkedin;
-    } // Update social media links if provided
+      user.socialMedia = {
+        ...user.socialMedia,
+        ...socialMedia, // Merge new social media data with existing data
+      };
+    }
 
     // Save the updated user document
     await user.save();
 
-    res
-      .status(200)
-      .json({ success: true, message: "Profile updated successfully", user });
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user,
+    });
   } catch (error) {
     console.error("Error in updateProfile:", error);
 
@@ -458,18 +465,31 @@ export const deleteProfile = async (req, res) => {
         .json({ success: false, message: "Invalid password" });
     }
 
+    // Store the profile picture URL for deletion after successful account deletion
+    const profilePictureUrl = user.profilePicture;
+
     // Delete the user
     await User.findByIdAndDelete(userId);
+
+    // Clear the authentication cookie
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
     });
+
+    // Remove the profile picture from Cloudinary if it exists
+    if (profilePictureUrl) {
+      const deleteResponse = await deleteImageBySecureUrl(profilePictureUrl);
+      console.log("Profile picture deleted from Cloudinary:", deleteResponse);
+    }
+
+    // Send success response
     res
       .status(200)
       .json({ success: true, message: "Profile deleted successfully" });
   } catch (error) {
-    console.log("Error in deleteProfile:", error);
+    console.error("Error in deleteProfile:", error);
     res.status(500).json({ success: false, message: "Error deleting profile" });
   }
 };
