@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import ProfileCard from "@/components/ProfileCard";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
 import { Input } from "@/components/ui/input";
@@ -13,31 +13,32 @@ import { FaSearch, FaSpinner } from "react-icons/fa";
 import { Navigate } from "react-router-dom";
 
 const Home = () => {
-  const { users, user,isAuthenticated } = useGlobalContext();
+  const { users, user, isAuthenticated } = useGlobalContext();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
-  const [filteredUsers, setFilteredUsers] = useState([]);
   const [usersArray, setUsersArray] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
-      setCurrentUser(user);
-    }
+    setCurrentUser(user || null);
   }, [user]);
 
   useEffect(() => {
     if (users) {
       setUsersArray(users);
+      setLoading(false);
     }
   }, [users]);
 
-  useEffect(() => {
+  const filteredUsers = useMemo(() => {
     const filtered = usersArray.filter((user) => {
+      const fullName = user.fullName || "";
+      const email = user.email || "";
       const matchesSearch =
-        user.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase());
+        fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        email.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesSearch;
     });
 
@@ -52,16 +53,15 @@ const Home = () => {
       }
     });
 
-    setFilteredUsers(sorted);
+    return sorted;
   }, [usersArray, searchQuery, sortOrder]);
 
-
-  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const storedUser = JSON.parse(localStorage.getItem("user") || "null");
   if (storedUser && !storedUser.isProfileComplete) {
     return <Navigate to="/create-profile" replace />;
   }
-  
-  if (!users) {
+
+  if (loading) {
     return (
       <div className="flex flex-grow w-full items-center justify-center p-4 md:p-6">
         <div className="flex items-center space-x-2">
