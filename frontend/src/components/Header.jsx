@@ -8,7 +8,7 @@ import {
   NavbarLink,
   ProfileAvatar,
   AuthButtons,
-} from "@/components/ui/Navbar";
+} from "@/components/ui/navbar";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
