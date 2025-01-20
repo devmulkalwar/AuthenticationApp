@@ -13,18 +13,28 @@ import { FaSearch, FaSpinner } from "react-icons/fa";
 import { Navigate } from "react-router-dom";
 
 const Home = () => {
-  const { users, user,isAuthenticated , checkAuth } = useGlobalContext();
+  const { users, user,isAuthenticated } = useGlobalContext();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
   const [filteredUsers, setFilteredUsers] = useState([]);
- 
-  useEffect(() => {
-    checkAuth();
-  }, []);
+  const [usersArray, setUsersArray] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    const filtered = users.filter((user) => {
+    if (user) {
+      setCurrentUser(user);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (users) {
+      setUsersArray(users);
+    }
+  }, [users]);
+
+  useEffect(() => {
+    const filtered = usersArray.filter((user) => {
       const matchesSearch =
         user.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.email.toLowerCase().includes(searchQuery.toLowerCase());
@@ -43,7 +53,7 @@ const Home = () => {
     });
 
     setFilteredUsers(sorted);
-  }, [users, searchQuery, sortOrder]);
+  }, [usersArray, searchQuery, sortOrder]);
 
 
   const storedUser = JSON.parse(localStorage.getItem("user"));
