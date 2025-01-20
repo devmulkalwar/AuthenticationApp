@@ -17,24 +17,34 @@ export function LoginForm({ className, ...props }) {
   const { login } = useGlobalContext();
   const formRef = useRef(null);
   const [loading, setLoading] = useState(false); // Add loading state
+  const [error, setError] = useState(""); // Add error state
 
   const handleSubmit = async (event) => {
     event.preventDefault(); // Prevent default form submission
 
+    // Reset error message
+    setError("");
+
     // Set loading to true
     setLoading(true);
 
-    // Access form data
-    const formData = new FormData(formRef.current);
+    try {
+      // Access form data
+      const formData = new FormData(formRef.current);
 
-    // Convert form data to a plain object
-    const data = {};
-    formData.forEach((value, key) => {
-      data[key] = value;
-    });
+      // Convert form data to a plain object
+      const data = {};
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
 
-    // Call the login function with the form data
-    await login(data);
+      await login(data);
+    } catch (err) {
+      console.log(err)
+    } finally {
+      // Stop loading spinner
+      setLoading(false);
+    }
   };
 
   return (

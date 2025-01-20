@@ -240,6 +240,7 @@ export const ContextProvider = ({ children }) => {
 
         setMessage(message);
         handleToast(message, "success"); // Display a success toast
+        await checkAuth();
         navigate("/"); // Navigate to the home page
       } else {
         throw new Error("Unexpected response from the server");
@@ -291,6 +292,7 @@ export const ContextProvider = ({ children }) => {
 
         setMessage(message);
         handleToast(message, "success"); // Success toast
+        await checkAuth();
         navigate(`/profile/${updatedProfileData._id}`);// Navigate to the profile page
       } else {
         throw new Error("Unexpected response from the server");

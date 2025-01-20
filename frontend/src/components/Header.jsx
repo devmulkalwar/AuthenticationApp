@@ -15,10 +15,9 @@ import { useGlobalContext } from "@/hooks/useGlobalContext";
 import defaultProfile from "../assets/defaultAvtar.png";
 
 const Header = () => {
-  const { isAuthenticated, logout, user } = useGlobalContext(); // Replace with your authentication logic
+  const { isAuthenticated, logout, user , checkAuth } = useGlobalContext(); // Replace with your authentication logic
   const [isOpen, setIsOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
@@ -28,11 +27,8 @@ const Header = () => {
   };
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      setCurrentUser(storedUser);
-    }
-  }, [user]);
+    checkAuth();
+  }, []);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -95,7 +91,7 @@ const Header = () => {
           <NavbarMenu className="order-3 hidden md:flex">
             <NavbarLinks>
               <NavbarLink to="/">Home</NavbarLink>
-              <NavbarLink to={`/profile/${currentUser?._id}`}>
+              <NavbarLink to={`/profile/${user?._id}`}>
                 Profile
               </NavbarLink>
               <NavbarLink to="/contact">Contact</NavbarLink>
@@ -149,7 +145,7 @@ const Header = () => {
 
             {/* Profile Avatar (Rightmost side) */}
             <ProfileAvatar
-              src={currentUser?.profilePicture || defaultProfile} // Use optional chaining for safety
+              src={user?.profilePicture || defaultProfile} // Use optional chaining for safety
               alt="Profile"
             />
           </NavbarMenu>
@@ -193,7 +189,7 @@ const Header = () => {
 
             {/* Profile Avatar */}
             <ProfileAvatar
-              src={currentUser?.profilePicture || defaultProfile} // Use optional chaining for safety
+              src={user?.profilePicture || defaultProfile} // Use optional chaining for safety
               alt="Profile"
             />
           </div>
@@ -208,7 +204,7 @@ const Header = () => {
               Home
             </NavbarLink>
             <NavbarLink
-              to={`/profile/${currentUser?._id || ""}`}
+              to={`/profile/${user?._id || ""}`}
               className="block"
             >
               Profile

@@ -51,9 +51,9 @@ const CreateProfile = () => {
 
     try {
       await createProfile(formData);
-       // Display success toast
+      // Display success toast
     } catch (error) {
-      console.log(error) // Display error toast
+      console.log(error); // Display error toast
     } finally {
       setIsSubmitting(false); // Reset submitting state
     }
@@ -71,12 +71,19 @@ const CreateProfile = () => {
       <div className="w-full max-w-2xl">
         <Card className={cn("flex flex-col gap-6")}>
           <CardHeader>
-            <CardTitle className="text-center">Edit Profile</CardTitle>
+            <CardTitle className="text-center">Create Profile</CardTitle>
             <CardDescription className="text-center">
-              Update your profile information and social media links.
+            <div
+              className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6"
+              role="alert"
+            >
+              
+              <p className="font-bold">Please complete your profile to access the website.</p>
+            </div>
             </CardDescription>
           </CardHeader>
           <CardContent>
+           
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Profile Picture */}
               <div className="flex flex-col items-center gap-4">
