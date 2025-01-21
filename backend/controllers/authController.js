@@ -508,19 +508,8 @@ export const deleteProfile = async (req, res) => {
 };
 
 export const getAllUsers = async (req, res) => {
-  const { userId } = req.query; // Fetch userId from the query string
-  console.log(userId);
-
   try {
-    if (!userId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "User ID is required" });
-    }
-
-    const loggedInUser = userId;
-
-    const users = await User.find({ _id: { $ne: loggedInUser } });
+    const users = await User.find();
     console.log(users);
 
     res.status(200).json({ success: true, users });

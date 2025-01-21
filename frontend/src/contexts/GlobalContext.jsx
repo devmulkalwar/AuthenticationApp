@@ -322,9 +322,7 @@ export const ContextProvider = ({ children }) => {
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
         setIsAuthenticated(true);
-
-        // Optionally, call getAllUsers if needed
-        getAllUsers(parsedUser._id);
+        getAllUsers();
 
         console.log("User data retrieved from localStorage:", parsedUser);
       } else {
@@ -340,13 +338,11 @@ export const ContextProvider = ({ children }) => {
           const user = response.data.user;
 
           setUser(user);
-          getAllUsers(user._id);
           setIsAuthenticated(true);
-
-          // Save user data to localStorage for future use
           localStorage.setItem("user", JSON.stringify(user));
 
-          console.log(user._id);
+          getAllUsers();
+  
         } else {
           setUser(null);
           setIsAuthenticated(false);
@@ -482,7 +478,7 @@ export const ContextProvider = ({ children }) => {
 
       // Show success toast
       handleToast(successMessage, "success");
-
+      await checkAuth();
       // Navigate to login
       navigate("/login");
     } catch (err) {
@@ -500,14 +496,14 @@ export const ContextProvider = ({ children }) => {
   };
 
   // Get all users
-  const getAllUsers = async (userId) => {
+  const getAllUsers = async () => {
     setIsLoading(true);
     setMessage(null);
     setError(null);
 
     try {
       const response = await axios.get(`${SERVER_URL}/get-all-users`, {
-        params: { userId }, // Send the userId as a query parameter
+        params: {  }, // Send the userId as a query parameter
         withCredentials: true, // This ensures the cookie is included in the request
       });
 
