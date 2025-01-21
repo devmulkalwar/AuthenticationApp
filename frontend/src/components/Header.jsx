@@ -144,10 +144,12 @@ const Header = () => {
             </button>
 
             {/* Profile Avatar (Rightmost side) */}
+            <Link to={`/profile/${user?._id}`}>
             <ProfileAvatar
               src={user?.profilePicture || defaultProfile} // Use optional chaining for safety
               alt="Profile"
             />
+            </Link>
           </NavbarMenu>
 
           {/* Mobile Navbar (Right side on small devices) */}

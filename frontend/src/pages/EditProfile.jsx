@@ -119,7 +119,7 @@ const EditProfile = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Profile Picture */}
               <div className="flex flex-col items-center gap-4">
-                <div className="w-24 h-24 border-2 border-red-500 rounded-full overflow-hidden">
+                <div className="w-24 h-24 border-2 rounded-full overflow-hidden">
                   <img
                     src={
                       profilePicture instanceof File
@@ -219,7 +219,10 @@ const EditProfile = () => {
               {/* Submit Button */}
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? (
-                  <FaSpinner className="animate-spin h-5 w-5 text-white" />
+                   <div className="flex items-center justify-center">
+                     <FaSpinner className="animate-spin h-5 w-5 text-white" />
+                      <span className="ml-2">Saving Changes...</span>
+                   </div>
                 ) : (
                   "Save Changes"
                 )}

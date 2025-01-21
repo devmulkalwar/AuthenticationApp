@@ -75,10 +75,10 @@ export default function Otp() {
                 disabled={isLoading} // Disable button when loading
               >
                 {isLoading ? ( // Show spinner when loading
-                  <>
-                    <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
-                    Verifying...
-                  </>
+                   <div className="flex items-center justify-center">
+                   <FaSpinner className="animate-spin h-5 w-5 text-white" />
+                   <span className="ml-2">Verifying...</span>
+                 </div>
                 ) : (
                   "Verify"
                 )}

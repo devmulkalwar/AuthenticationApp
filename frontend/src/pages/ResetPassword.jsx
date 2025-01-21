@@ -78,10 +78,10 @@ const ResetPassword = () => {
               />
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? ( // Show spinner when loading
-                  <>
-                    <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
-                    Resetting...
-                  </>
+                  <div className="flex items-center justify-center">
+                  <FaSpinner className="animate-spin h-5 w-5 text-white" />
+                   <span className="ml-2">Reseting Password...</span>
+                </div>
                 ) : (
                   "Reset Password"
                 )}

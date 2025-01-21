@@ -22,7 +22,8 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setCurrentUser(user || null);
+    const storedUser = JSON.parse(localStorage.getItem("user") || "null");
+    setCurrentUser(storedUser || null);
   }, [user]);
 
   useEffect(() => {
@@ -126,12 +127,12 @@ const Home = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {filteredUsers.length > 0 ? (
             filteredUsers.map((user, index) => (
-              <div
+             user.isProfileComplete && ( <div
                 key={index}
                 className=" flex justify-center items-center transform transition-transform duration-300 hover:scale-105"
               >
                 <ProfileCard {...user} />
-              </div>
+              </div>)
             ))
           ) : (
             <p className="text-center col-span-full text-gray-600">

@@ -16,7 +16,7 @@ const ForgotPassword = () => {
   const { forgotPassword, handleToast, user, setMessage } = useGlobalContext();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false); // Added loading state for better UX
- 
+
   const storedUser = localStorage.getItem("user");
   if (storedUser) {
     return <Navigate to="/" replace />;
@@ -34,7 +34,7 @@ const ForgotPassword = () => {
     try {
       await forgotPassword(email); // Call the forgotPassword function
     } catch (error) {
-     console.log(error); //
+      console.log(error); //
     } finally {
       setLoading(false); // Reset loading state
     }
@@ -62,10 +62,10 @@ const ForgotPassword = () => {
               />
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? ( // Show spinner when loading
-                  <>
-                    <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
-                    Sending...
-                  </>
+                  <div className="flex items-center justify-center">
+                    <FaSpinner className="animate-spin h-5 w-5 text-white" />
+                    <span className="ml-2">Submitting...</span>
+                  </div>
                 ) : (
                   "Submit"
                 )}

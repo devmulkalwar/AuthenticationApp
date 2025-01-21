@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
 import { FaSpinner } from "react-icons/fa"; // Spinner icon from react-icons
 import defaultProfile from "../assets/defaultAvtar.png";
+import { Navigate } from "react-router-dom";
 const CreateProfile = () => {
   const { createProfile, user, isAuthenticated, handleToast } =
     useGlobalContext();
@@ -66,6 +67,11 @@ const CreateProfile = () => {
     }
   };
 
+const storedUser = JSON.parse(localStorage.getItem("user"));
+  if (storedUser && storedUser.isProfileComplete) {
+    return <Navigate to="/" replace />;
+  }
+
   return (
     <div className="flex flex-grow w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-2xl">
@@ -73,17 +79,17 @@ const CreateProfile = () => {
           <CardHeader>
             <CardTitle className="text-center">Create Profile</CardTitle>
             <CardDescription className="text-center">
-            <div
-              className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6"
-              role="alert"
-            >
-              
-              <p className="font-bold">Please complete your profile to access the website.</p>
-            </div>
+              <div
+                className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6"
+                role="alert"
+              >
+                <p className="font-bold">
+                  Please complete your profile to access the website.
+                </p>
+              </div>
             </CardDescription>
           </CardHeader>
           <CardContent>
-           
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Profile Picture */}
               <div className="flex flex-col items-center gap-4">
@@ -214,7 +220,10 @@ const CreateProfile = () => {
                 disabled={isSubmitting} // Disable button while submitting
               >
                 {isSubmitting ? (
-                  <FaSpinner className="animate-spin h-5 w-5 text-white" />
+                  <div className="flex items-center justify-center">
+                    <FaSpinner className="animate-spin h-5 w-5 text-white" />
+                    <span className="ml-2">Creating Profile...</span>
+                  </div>
                 ) : (
                   "Create Profile"
                 )}

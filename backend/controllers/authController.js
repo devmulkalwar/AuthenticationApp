@@ -332,7 +332,7 @@ export const createProfile = async (req, res) => {
     let profilePictureUrl = "";
     if (profilePicture) {
       const cloudinaryResult = await uploadOnCloudinary(path);
-      profilePictureUrl = cloudinaryResult.url;
+      profilePictureUrl = cloudinaryResult.secure_url;
     }
 
     // Update user fields
@@ -470,7 +470,7 @@ export const deleteProfile = async (req, res) => {
 
     // Delete the user
     await User.findByIdAndDelete(userId);
-
+   
     // Clear the authentication cookie
     res.clearCookie("token", {
       httpOnly: true,

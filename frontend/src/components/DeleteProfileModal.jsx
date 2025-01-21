@@ -47,10 +47,10 @@ const DeleteProfileModal = ({
               disabled={isDeleting} // Disable button while loading
             >
               {isDeleting ? ( // Show spinner when loading
-                <>
-                  <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
-                </>
+                 <div className="flex items-center justify-center">
+                 <FaSpinner className="animate-spin h-5 w-5 text-white" />
+                 <span className="ml-2">Deleting...</span>
+               </div>
               ) : (
                 "Delete"
               )}

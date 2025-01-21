@@ -15,21 +15,21 @@ import { useGlobalContext } from "@/hooks/useGlobalContext";
 import { Navigate } from "react-router-dom";
 
 const Contact = () => {
-  const { user, handleToast,isAuthenticated } = useGlobalContext(); // Access user data from context
+  const { user, handleToast, isAuthenticated } = useGlobalContext(); // Access user data from context
   const form = useRef(); // Create form ref
   const [email, setEmail] = useState(""); // Initialize email state
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState("");
-  const[currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   useEffect(() => {
     if (user) {
       setCurrentUser(user);
       setEmail(user.email);
     }
   }, [user]);
-  
+
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -67,7 +67,7 @@ const Contact = () => {
         }
       );
   };
-  
+
   const storedUser = JSON.parse(localStorage.getItem("user"));
   if (storedUser && !storedUser.isProfileComplete) {
     return <Navigate to="/create-profile" replace />;
@@ -108,7 +108,7 @@ const Contact = () => {
 
               {/* Subject */}
               <Input
-                name="subject" 
+                name="subject"
                 type="text"
                 placeholder="Subject"
                 value={subject}
@@ -118,7 +118,7 @@ const Contact = () => {
 
               {/* Message */}
               <Textarea
-                name="message" 
+                name="message"
                 placeholder="Your Message"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -128,7 +128,14 @@ const Contact = () => {
 
               {/* Submit Button */}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Sending..." : "Send Message"}
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <FaSpinner className="animate-spin h-5 w-5 text-white" />
+                    <span className="ml-2">Sending...</span>
+                  </div>
+                ) : (
+                  "Send Message"
+                )}
               </Button>
             </form>
           </CardContent>

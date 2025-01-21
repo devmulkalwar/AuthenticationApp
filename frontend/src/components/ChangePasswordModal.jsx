@@ -62,10 +62,10 @@ const ChangePasswordModal = ({
               disabled={isChangingPassword} // Disable button while loading
             >
               {isChangingPassword ? ( // Show spinner when loading
-                <>
-                  <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
-                  Changing...
-                </>
+                <div className="flex items-center justify-center">
+                  <FaSpinner className="animate-spin h-5 w-5 text-white" />
+                  <span className="ml-2">Changing Password...</span>
+                </div>
               ) : (
                 "Change Password"
               )}

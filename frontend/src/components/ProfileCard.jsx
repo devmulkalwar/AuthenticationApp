@@ -5,18 +5,18 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns"; // For date formatting
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
-import defaultProfile from  "../assets/defaultAvtar.png";
+import defaultProfile from "../assets/defaultAvtar.png";
 
 const ProfileCard = ({
   profilePicture,
-  name,
+  fullName,
   email,
   socialMedia,
   createdAt,
   _id,
 }) => {
   // Format the date
-    const formattedDate = createdAt
+  const formattedDate = createdAt
     ? new Date(createdAt).toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
@@ -25,81 +25,85 @@ const ProfileCard = ({
     : "Unknown date";
   return (
     <Card
-      className={cn(
-        "flex flex-col items-center text-center h-auto w-64", // Removed fixed height
-        "p-4 shadow-md rounded-lg border"
-      )}
-    >
-      <CardHeader className="flex flex-col items-center">
-        {/* Profile Picture */}
-        <div className="w-20 h-20 mb-4 rounded-full overflow-hidden">
-          <img
-            src={profilePicture || defaultProfile}
-            alt={name || "Profile Picture"}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        {/* Name */}
-        <h2 className="text-lg font-semibold truncate w-full">{name}</h2>
-        {/* Email */}
-        <p className="text-xs text-gray-600 truncate w-full">{email}</p>
-      </CardHeader>
-      <CardContent className="flex flex-col justify-between flex-grow w-full">
-        {/* Social Media Links */}
-        <div className="flex justify-center space-x-4 mt-4">
-          {socialMedia?.twitter && (
-            <a
-              href={socialMedia.twitter}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-400 hover:text-blue-500"
-            >
-              <FaTwitter className="w-5 h-5" />
-            </a>
-          )}
-          {socialMedia?.linkedin && (
-            <a
-              href={socialMedia.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-700"
-            >
-              <FaLinkedin className="w-5 h-5" />
-            </a>
-          )}
-          {socialMedia?.github && (
-            <a
-              href={socialMedia.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-800 hover:text-gray-900"
-            >
-              <FaGithub className="w-5 h-5" />
-            </a>
-          )}
-          {socialMedia?.instagram && (
-            <a
-              href={socialMedia.instagram}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-pink-600 hover:text-pink-700"
-            >
-              <FaInstagram className="w-5 h-5" />
-            </a>
-          )}
-        </div>
-        {/* Member Since */}
-        <p className="text-xs text-gray-500 mt-4">Member since {formattedDate}</p>
-        {/* Profile Button */}
-        <div className="mt-4">
-          <Link to={`/profile/${_id || ""}`}>
-            <Button className="w-full">
-              View Profile
-            </Button>
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
+    className={cn(
+      "flex-grow flex flex-col items-center text-center h-auto w-80", 
+      "p-6 shadow-lg rounded-xl border bg-background" // Background and border colors from the theme
+    )}
+  >
+    <CardHeader className="flex flex-col items-center space-y-3">
+      {/* Profile Picture */}
+      <div className="w-24 h-24 rounded-full overflow-hidden shadow-md">
+        <img
+          src={profilePicture || defaultProfile}
+          alt={fullName || "Profile Picture"}
+          className="w-full h-full object-cover"
+        />
+      </div>
+      {/* Name */}
+      <h2 className="text-xl font-medium tracking-tight text-foreground">{fullName || "N/A"}</h2>
+      {/* Email */}
+      <p className="text-sm text-muted-foreground truncate w-full">{email || "N/A"}</p>
+    </CardHeader>
+    <CardContent className="flex flex-col justify-between flex-grow w-full space-y-4">
+      {/* Social Media Links */}
+      <div className="flex justify-center space-x-6 mt-2">
+        {socialMedia?.twitter && (
+          <a
+            href={socialMedia.twitter}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:scale-110 transition-transform text-foreground"
+          >
+            <FaTwitter className="w-6 h-6" />
+          </a>
+        )}
+        {socialMedia?.linkedin && (
+          <a
+            href={socialMedia.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:scale-110 transition-transform text-foreground"
+          >
+            <FaLinkedin className="w-6 h-6" />
+          </a>
+        )}
+        {socialMedia?.github && (
+          <a
+            href={socialMedia.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:scale-110 transition-transform text-foreground"
+          >
+            <FaGithub className="w-6 h-6" />
+          </a>
+        )}
+        {socialMedia?.instagram && (
+          <a
+            href={socialMedia.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:scale-110 transition-transform text-foreground"
+          >
+            <FaInstagram className="w-6 h-6" />
+          </a>
+        )}
+      </div>
+      {/* Member Since */}
+      <p className="text-xs italic text-muted-foreground">
+        Member since {formattedDate || "N/A"}
+      </p>
+      {/* Profile Button */}
+      <div className="mt-4">
+        <Link to={`/profile/${_id || ""}`}>
+          <Button className="w-full rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-shadow bg-primary text-primary-foreground">
+            View Profile
+          </Button>
+        </Link>
+      </div>
+    </CardContent>
+  </Card>
+  
+  
   );
 };
 
