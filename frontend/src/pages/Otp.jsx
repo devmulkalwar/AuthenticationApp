@@ -40,6 +40,11 @@ export default function Otp() {
     }
   };
 
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser && storedUser.isVerified) {
+      return <Navigate to="/" replace />;
+    }
+
   return (
     <div className="flex flex-grow w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">

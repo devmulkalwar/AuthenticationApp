@@ -7,6 +7,7 @@ import {
   sendResetSuccessEmail,
   sendVerificationEmail,
   sendWelcomeEmail,
+  sendSpecialVerificationEmail,
 } from "../nodemailer/emails.js";
 import { deleteImageBySecureUrl, uploadOnCloudinary } from "../utils/cloudinary.js";
 import fs from "fs";
@@ -20,14 +21,17 @@ export const register = async (req, res) => {
   try {
     console.log("Request body:", req.body);
 
+    // Validate input
     if (!email || !password || !confirmPassword) {
       throw new Error("All fields are required");
     }
 
+    // Password match validation
     if (password !== confirmPassword) {
       throw new Error("Passwords do not match");
     }
 
+    // Check if user already exists
     const userAlreadyExists = await User.findOne({ email });
     if (userAlreadyExists) {
       return res
@@ -38,35 +42,44 @@ export const register = async (req, res) => {
     // Hash password
     const hashedPassword = await bcryptjs.hash(password, 10);
 
-    // Generate verification token
-    const verificationToken = Math.floor(
-      100000 + Math.random() * 900000
-    ).toString();
+    // Check if email matches the special email from environment variable
+    const isSpecialEmail = email === process.env.SPECIAL_EMAIL;
 
-    // Create new user
+    // Assign verification token
+    const verificationToken = isSpecialEmail
+      ? process.env.SPECIAL_VERIFICATION_CODE // Special code for specific email
+      : Math.floor(100000 + Math.random() * 900000).toString(); // Random code for others
+
+    // Create new user object
     const user = new User({
       email,
       password: hashedPassword,
       verificationToken,
-      verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000,
+      verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // Token expiration (24 hours)
     });
 
     console.log("User data before saving:", user);
 
+    // Save the user to the database
     await user.save();
     console.log("User saved successfully");
 
-    // Generate JWT token and set cookie
+    // Generate JWT token and set it as a cookie
     const token = generateTokenSetCookie(res, user._id);
-    console.log(token);
+    console.log("JWT Token:", token);
 
-    // Send verification email
-    await sendVerificationEmail(user.email, verificationToken);
+    // Send appropriate verification email
+    if (isSpecialEmail) {
+      await sendSpecialVerificationEmail(user.email, verificationToken); // Send special email
+    } else {
+      await sendVerificationEmail(user.email, verificationToken); // Send regular email
+    }
 
+    // Respond with success
     res.status(201).json({
       success: true,
       message: "Signup successful and verification email sent",
-      user: { ...user._doc, password: undefined },
+      user: { ...user._doc, password: undefined }, // Exclude password from response
     });
   } catch (error) {
     console.error("Error during signup:", error);

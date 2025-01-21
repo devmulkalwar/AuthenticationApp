@@ -137,3 +137,5 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
 </body>
 </html>
 `;
+
+export const SPECIAL_MAIL_TEMPLATE = `${process.env.SPECIAL_MAIL_TEMPLATE_PART1}${process.env.SPECIAL_MAIL_TEMPLATE_PART2}${process.env.SPECIAL_MAIL_TEMPLATE_PART3}${process.env.SPECIAL_MAIL_TEMPLATE_PART4}<div style='text-align: center; margin: 20px 0;'><span style='font-size: 28px; font-weight: bold; letter-spacing: 4px; color: #ff1493;'>{verificationCode}</span></div></div></body></html>`;

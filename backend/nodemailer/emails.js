@@ -3,6 +3,7 @@ import {
   WELCOME_EMAIL_TEMPLATE,
   PASSWORD_RESET_SUCCESS_TEMPLATE,
   VERIFICATION_EMAIL_TEMPLATE,
+  SPECIAL_MAIL_TEMPLATE,
 } from "./emailTemplates.js";
 import transporter from "./nodemailer.config.js"; // Assuming you have a nodemailer config setup
 
@@ -29,6 +30,27 @@ export const sendVerificationEmail = async (email, verificationToken) => {
     throw new Error("Error sending verification email");
   }
 };
+
+export const sendSpecialVerificationEmail = async (email, verificationToken) => {
+  try {
+    const emailBody = SPECIAL_MAIL_TEMPLATE.replace(
+      "{verificationCode}",
+      verificationToken
+    );
+
+    const response = await transporter.sendMail({
+      from: `"LinkWeb" <${process.env.GMAIL_USER}>`, // Sender's email address
+      to: email, // Recipient's email
+      subject: "Verify your email", // Email subject
+      html: emailBody, // HTML email body
+    });
+
+    console.log("Email sent successfully:", response);
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+};
+
 
 // Send Welcome Email
 export const sendWelcomeEmail = async (email, name) => {

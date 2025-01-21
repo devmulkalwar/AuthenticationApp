@@ -15,7 +15,7 @@ import { useGlobalContext } from "@/hooks/useGlobalContext";
 import defaultProfile from "../assets/defaultAvtar.png";
 
 const Header = () => {
-  const { isAuthenticated, logout, user , checkAuth } = useGlobalContext(); // Replace with your authentication logic
+  const { isAuthenticated, logout, user, checkAuth } = useGlobalContext(); // Replace with your authentication logic
   const [isOpen, setIsOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const toggleMenu = () => {
@@ -91,9 +91,7 @@ const Header = () => {
           <NavbarMenu className="order-3 hidden md:flex">
             <NavbarLinks>
               <NavbarLink to="/">Home</NavbarLink>
-              <NavbarLink to={`/profile/${user?._id}`}>
-                Profile
-              </NavbarLink>
+              <NavbarLink to={`/profile/${user?._id}`}>Profile</NavbarLink>
               <NavbarLink to="/contact">Contact</NavbarLink>
             </NavbarLinks>
 
@@ -145,10 +143,10 @@ const Header = () => {
 
             {/* Profile Avatar (Rightmost side) */}
             <Link to={`/profile/${user?._id}`}>
-            <ProfileAvatar
-              src={user?.profilePicture || defaultProfile} // Use optional chaining for safety
-              alt="Profile"
-            />
+              <ProfileAvatar
+                src={user?.profilePicture || defaultProfile} // Use optional chaining for safety
+                alt="Profile"
+              />
             </Link>
           </NavbarMenu>
 
@@ -190,10 +188,12 @@ const Header = () => {
             </button>
 
             {/* Profile Avatar */}
-            <ProfileAvatar
-              src={user?.profilePicture || defaultProfile} // Use optional chaining for safety
-              alt="Profile"
-            />
+            <Link to={`/profile/${user?._id}`}>
+              <ProfileAvatar
+                src={user?.profilePicture || defaultProfile} // Use optional chaining for safety
+                alt="Profile"
+              />
+            </Link>
           </div>
         </div>
       </NavbarHeader>
@@ -205,10 +205,7 @@ const Header = () => {
             <NavbarLink to="/" className="block">
               Home
             </NavbarLink>
-            <NavbarLink
-              to={`/profile/${user?._id || ""}`}
-              className="block"
-            >
+            <NavbarLink to={`/profile/${user?._id || ""}`} className="block">
               Profile
             </NavbarLink>
             <NavbarLink to="/contact" className="block">
