@@ -148,7 +148,7 @@ export const ContextProvider = ({ children }) => {
 
       // Display success toast
       handleToast("Logged out successfully!", "success");
-
+      await checkAuth();
       // Navigate to the login page
       navigate("/login");
     } catch (err) {
