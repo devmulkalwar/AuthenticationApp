@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import emailjs from "emailjs-com"; // Import EmailJS SDK
 import { useGlobalContext } from "@/hooks/useGlobalContext";
 import { Navigate } from "react-router-dom";
+import { FaSpinner } from "react-icons/fa";
 
 const Contact = () => {
   const { user, handleToast, isAuthenticated } = useGlobalContext(); // Access user data from context
