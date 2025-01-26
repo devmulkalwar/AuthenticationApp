@@ -9,7 +9,10 @@ import {
   sendWelcomeEmail,
   sendSpecialVerificationEmail,
 } from "../nodemailer/emails.js";
-import { deleteImageBySecureUrl, uploadOnCloudinary } from "../utils/cloudinary.js";
+import {
+  deleteImageBySecureUrl,
+  uploadOnCloudinary,
+} from "../utils/cloudinary.js";
 import fs from "fs";
 import dotenv from "dotenv";
 dotenv.config();
@@ -19,8 +22,6 @@ export const register = async (req, res) => {
   const { email, password, confirmPassword } = req.body;
 
   try {
-    console.log("Request body:", req.body);
-
     // Validate input
     if (!email || !password || !confirmPassword) {
       throw new Error("All fields are required");
@@ -58,15 +59,11 @@ export const register = async (req, res) => {
       verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // Token expiration (24 hours)
     });
 
-    console.log("User data before saving:", user);
-
     // Save the user to the database
     await user.save();
-    console.log("User saved successfully");
 
     // Generate JWT token and set it as a cookie
     const token = generateTokenSetCookie(res, user._id);
-    console.log("JWT Token:", token);
 
     // Send appropriate verification email
     if (isSpecialEmail) {
@@ -79,7 +76,7 @@ export const register = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Signup successful and verification email sent",
-      user: { ...user._doc, password: undefined }, // Exclude password from response
+      user: { ...user._doc, password: undefined },
     });
   } catch (error) {
     console.error("Error during signup:", error);
@@ -120,7 +117,7 @@ export const verifyEmail = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log("Error in email verification ", error);
+    console.error("Error in email verification ", error);
     res
       .status(500)
       .json({ success: false, message: "Error in email verification" });
@@ -130,7 +127,6 @@ export const verifyEmail = async (req, res) => {
 // Login user
 export const login = async (req, res) => {
   const { email, password } = req.body;
-  console.log("from backend", email, password);
   try {
     const user = await User.findOne({ email });
 
@@ -161,7 +157,7 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log("Error in login ", error);
+    console.error("Error in login ", error);
     res.status(400).json({ success: false, message: error.message });
   }
 };
@@ -191,9 +187,6 @@ export const forgotPassword = async (req, res) => {
     const resetToken = crypto.randomBytes(20).toString("hex");
     const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
 
-    console.log("Stored token from forgot pass:", resetToken);
-    console.log("Token expiration date:", resetTokenExpiresAt);
-
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpiresAt = resetTokenExpiresAt;
     await user.save();
@@ -210,7 +203,7 @@ export const forgotPassword = async (req, res) => {
       resetToken: user.resetPasswordToken,
     });
   } catch (error) {
-    console.log("Error in Forgot password ", error);
+    console.error("Error in Forgot password ", error);
     res
       .status(400)
       .json({ success: false, message: "Error in Forgot password" });
@@ -222,9 +215,6 @@ export const resetPassword = async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
   try {
-    console.log("Reset password route hit!");
-    console.log("token from reset password", token, password);
-
     const user = await User.findOne({
       resetPasswordToken: token,
       resetPasswordExpiresAt: { $gt: Date.now() },
@@ -236,11 +226,6 @@ export const resetPassword = async (req, res) => {
         .json({ success: false, message: "Invalid or expired reset token" });
     }
 
-    console.log("Stored token:", user.resetPasswordToken);
-    console.log("Token expiration date:", user.resetPasswordExpiresAt);
-
-    console.log("old password", user.password);
-
     // Update password
     const hashedPassword = await bcryptjs.hash(password, 10);
 
@@ -248,14 +233,13 @@ export const resetPassword = async (req, res) => {
     user.resetPasswordToken = undefined;
     user.resetPasswordExpiresAt = undefined;
     await user.save();
-    console.log(user.password);
     await sendResetSuccessEmail(user.email);
 
     res
       .status(200)
       .json({ success: true, message: "Password reset successful" });
   } catch (error) {
-    console.log("Error in resetPassword ", error);
+    console.error("Error in resetPassword ", error);
     res.status(400).json({ success: false, message: "Error in resetPassword" });
   }
 };
@@ -270,9 +254,15 @@ export const checkAuth = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
-    res.status(200).json({ success: true, user });
+    res.status(200).json({
+      success: true,
+      user: {
+        ...user._doc,
+        password: undefined,
+      },
+    });
   } catch (error) {
-    console.log("Error in checkAuth ", error);
+    console.error("Error in checkAuth ", error);
     res.status(400).json({ success: false, message: "Error in checkAuth" });
   }
 };
@@ -310,7 +300,7 @@ export const changePassword = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Password changed successfully" });
   } catch (error) {
-    console.log("Error in changePassword ", error);
+    console.error("Error in changePassword ", error);
     res
       .status(500)
       .json({ success: false, message: "Error changing password" });
@@ -359,9 +349,14 @@ export const createProfile = async (req, res) => {
     await user.save();
     // Send welcome email to the new user
     await sendWelcomeEmail(user.email, user.fullName);
-    res
-      .status(200)
-      .json({ success: true, message: "Profile created successfully", user });
+    res.status(200).json({
+      success: true,
+      message: "Profile created successfully",
+      user: {
+        ...user._doc,
+        password: undefined,
+      },
+    });
   } catch (error) {
     console.error("Error in createProfile:", error);
 
@@ -418,7 +413,9 @@ export const updateProfile = async (req, res) => {
 
       // Delete the old profile picture from Cloudinary (if it exists)
       if (user.profilePicture) {
-        const deleteResponse = await deleteImageBySecureUrl(user.profilePicture);
+        const deleteResponse = await deleteImageBySecureUrl(
+          user.profilePicture
+        );
         console.log("Old profile picture deleted:", deleteResponse);
       }
     }
@@ -483,7 +480,7 @@ export const deleteProfile = async (req, res) => {
 
     // Delete the user
     await User.findByIdAndDelete(userId);
-   
+
     // Clear the authentication cookie
     res.clearCookie("token", {
       httpOnly: true,
@@ -509,9 +506,7 @@ export const deleteProfile = async (req, res) => {
 
 export const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find();
-    console.log(users);
-
+    const users = await User.find().select("-password");
     res.status(200).json({ success: true, users });
   } catch (error) {
     console.error("Error in getAllUsers:", error);

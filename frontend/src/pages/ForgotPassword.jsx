@@ -34,7 +34,7 @@ const ForgotPassword = () => {
     try {
       await forgotPassword(email); // Call the forgotPassword function
     } catch (error) {
-      console.log(error); //
+      console.error(error); //
     } finally {
       setLoading(false); // Reset loading state
     }

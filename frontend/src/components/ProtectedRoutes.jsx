@@ -7,7 +7,6 @@ const ProtectedRoute = ({ children }) => {
 
   useEffect(() => {
     if (!storedUser) {
-      // Optionally, you can add logging or state updates here
       console.log("No stored user found. Redirecting to login...");
     }
   }, [storedUser]);

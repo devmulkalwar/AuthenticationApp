@@ -41,7 +41,7 @@ export function LoginForm({ className, ...props }) {
 
       await login(data);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     } finally {
       // Stop loading spinner
       setLoading(false);

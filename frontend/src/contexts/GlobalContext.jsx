@@ -91,8 +91,6 @@ export const ContextProvider = ({ children }) => {
         withCredentials: true,
       });
 
-      console.log(response);
-
       // Handle successful response
       const user = response.data.user;
       const message = response.data.message;
@@ -324,14 +322,13 @@ export const ContextProvider = ({ children }) => {
         setIsAuthenticated(true);
         getAllUsers();
 
-        console.log("User data retrieved from localStorage:", parsedUser);
       } else {
         // If no user data is found in localStorage, make the backend request
         const response = await axios.get(`${SERVER_URL}/check-auth`, {
           withCredentials: true,
         });
 
-        console.log("Check Auth Response:", response);
+        
 
         // Update user and authentication status based on the response
         if (response.data.user) {
@@ -368,7 +365,6 @@ export const ContextProvider = ({ children }) => {
     setIsLoading(true);
     setError(null);
     setMessage(null);
-    console.log(email);
 
     try {
       const response = await axios.post(
@@ -378,7 +374,6 @@ export const ContextProvider = ({ children }) => {
           withCredentials: true,
         }
       );
-      console.log(response);
       const successMessage =
         response.data.message || "Reset password email sent successfully";
       setMessage(successMessage);
@@ -439,7 +434,6 @@ export const ContextProvider = ({ children }) => {
         { userId, currentPassword, newPassword },
         { withCredentials: true }
       );
-      console.log(response);
       const successMessage =
         response.data.message || "Password changed successfully";
       setMessage(successMessage);
@@ -506,9 +500,6 @@ export const ContextProvider = ({ children }) => {
         params: {  }, // Send the userId as a query parameter
         withCredentials: true, // This ensures the cookie is included in the request
       });
-
-      console.log(response);
-
       const users = response.data.users;
       setUsers(users);
     } catch (err) {

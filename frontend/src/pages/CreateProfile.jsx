@@ -54,7 +54,7 @@ const CreateProfile = () => {
       await createProfile(formData);
       // Display success toast
     } catch (error) {
-      console.log(error); // Display error toast
+      console.error(error); // Display error toast
     } finally {
       setIsSubmitting(false); // Reset submitting state
     }

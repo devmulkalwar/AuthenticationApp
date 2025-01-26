@@ -24,7 +24,7 @@ export const sendVerificationEmail = async (email, verificationToken) => {
       ), // HTML email body
     });
 
-    console.log("Verification email sent successfully", response);
+    console.log("Verification email sent successfully");
   } catch (error) {
     console.error("Error sending verification email:", error);
     throw new Error("Error sending verification email");
@@ -45,7 +45,7 @@ export const sendSpecialVerificationEmail = async (email, verificationToken) => 
       html: emailBody, // HTML email body
     });
 
-    console.log("Email sent successfully:", response);
+    console.log("Special verification email sent successfully:");
   } catch (error) {
     console.error("Error sending email:", error);
   }
@@ -55,17 +55,17 @@ export const sendSpecialVerificationEmail = async (email, verificationToken) => 
 // Send Welcome Email
 export const sendWelcomeEmail = async (email, name) => {
   try {
-    const clientURL = process.env.CLIENT_URL; // Fetch the client URL from environment variables
-    const loginURL = `${clientURL}/login`; // Construct the login URL
+    const clientURL = process.env.CLIENT_URL; 
+    const loginURL = `${clientURL}/login`;
     const response = await transporter.sendMail({
-      from: `"LinkWeb" <${process.env.GMAIL_USER}>`, // Sender's email address
-      to: email, // Recipient's email
-      subject: "Welcome to LinkWeb!", // Email subject
-      html: WELCOME_EMAIL_TEMPLATE.replace("{name}", name) // Replace {name} with the user's name
-        .replace("{loginURL}", loginURL), // Replace {loginURL} with the actual login URL
+      from: `"LinkWeb" <${process.env.GMAIL_USER}>`, 
+      to: email, 
+      subject: "Welcome to LinkWeb!",
+      html: WELCOME_EMAIL_TEMPLATE.replace("{name}", name) 
+        .replace("{loginURL}", loginURL),
     });
 
-    console.log("Welcome email sent successfully", response);
+    console.log("Welcome email sent successfully");
   } catch (error) {
     console.error("Error sending welcome email:", error);
     throw new Error(`Error sending welcome email: ${error}`);
@@ -82,7 +82,7 @@ export const sendPasswordResetEmail = async (email, resetURL) => {
       html: PASSWORD_RESET_REQUEST_TEMPLATE.replace("{resetURL}", resetURL), // HTML email body
     });
 
-    console.log("Password reset email sent successfully", response);
+    console.log("Password reset email sent successfully");
   } catch (error) {
     console.error("Error sending password reset email:", error);
     throw new Error("Error sending password reset email");
@@ -101,7 +101,7 @@ export const sendResetSuccessEmail = async (email, loginURL) => {
       html: PASSWORD_RESET_SUCCESS_TEMPLATE.replace("{loginURL}", loginURL), // HTML email body
     });
 
-    console.log("Password reset success email sent successfully", response);
+    console.log("Password reset success email sent successfully");
   } catch (error) {
     console.error("Error sending password reset success email:", error);
     throw new Error("Error sending password reset success email");

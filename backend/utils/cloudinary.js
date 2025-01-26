@@ -24,7 +24,7 @@ const uploadOnCloudinary = async (localFilePath) => {
       throw new Error("Cloudinary did not return a secure URL");
     }
 
-    console.log("File uploaded to Cloudinary:", response.secure_url);
+    console.log("File uploaded to Cloudinary:");
 
     // Delete the local file after upload
     fs.unlinkSync(localFilePath);
@@ -56,7 +56,7 @@ const deleteImageBySecureUrl = async (secureUrl) => {
     }
 
     const result = await cloudinary.uploader.destroy(publicId);
-    console.log("Image deleted successfully:", result);
+    console.log("Image deleted successfully:");
     return result;
   } catch (error) {
     console.error("Error deleting image from Cloudinary:", error.message);

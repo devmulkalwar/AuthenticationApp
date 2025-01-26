@@ -42,7 +42,7 @@ const ResetPassword = () => {
     try {
       await resetPassword(token, newPassword);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false); // Reset loading state
     }

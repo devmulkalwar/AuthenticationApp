@@ -50,8 +50,6 @@ const Contact = () => {
       )
       .then(
         (response) => {
-          // Success message handling
-          console.log("Email sent successfully", response);
           handleToast("Your message has been sent successfully!", "success");
           setMessage("");
           setSubject("");
